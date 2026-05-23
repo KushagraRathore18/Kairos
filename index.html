@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kairos — Elevate Your Life</title>
+  <!-- Google Fonts: Outfit and Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Vanilla CSS Style Sheet -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <!-- Ambient Liquid Gradient Background Canvas -->
+  <canvas id="ambient-canvas"></canvas>
+  <div class="ambient-overlay"></div>
+
+  <!-- Main Application Wrapper -->
+  <div class="app-wrapper">
+    <!-- Top Navigation and Progress Bar -->
+    <header class="app-header" id="app-header">
+      <div class="header-container">
+        <button id="btn-back" class="nav-btn" aria-label="Go Back">
+          <i data-lucide="chevron-left"></i>
+          <span>Back</span>
+        </button>
+        
+        <div class="progress-bar-wrapper">
+          <div class="progress-track">
+            <div id="progress-bar-fill" class="progress-fill"></div>
+          </div>
+          <span id="progress-text" class="progress-text">Step 1 of 4</span>
+        </div>
+
+        <button id="btn-reset" class="nav-btn reset-btn" aria-label="Reset Onboarding" title="Reset Onboarding">
+          <i data-lucide="rotate-ccw"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Dynamic Content Container -->
+    <main id="app-container" class="app-container">
+      <!-- Active Question Card / Sign-In Screen will be injected here dynamically -->
+    </main>
+  </div>
+
+  <!-- Live Developer Database Inspector Panel -->
+  <div id="db-inspector" class="db-inspector">
+    <div class="db-inspector-header">
+      <div class="db-title-group">
+        <i data-lucide="database"></i>
+        <h3>Kairos Database Inspector</h3>
+      </div>
+      <button id="btn-db-close" class="btn-db-close" aria-label="Close Inspector">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    
+    <div class="db-inspector-body">
+      <div class="db-actions">
+        <button id="btn-db-refresh" class="db-action-btn secondary">
+          <i data-lucide="refresh-cw"></i> Refresh
+        </button>
+        <button id="btn-db-clear" class="db-action-btn danger">
+          <i data-lucide="trash-2"></i> Clear Database
+        </button>
+      </div>
+
+      <div class="db-stats">
+        <span class="db-stat-item">Total Sessions: <strong id="db-stat-count">0</strong></span>
+        <span class="db-stat-item">Storage Engine: <strong>IndexedDB (v1)</strong></span>
+      </div>
+
+      <div class="db-table-wrapper">
+        <table class="db-table" id="db-records-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Name</th>
+              <th>Archetype</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="db-records-body">
+            <!-- Dynamically populated rows -->
+            <tr class="db-empty-row">
+              <td colspan="4">No sessions stored in database yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- JSON Detail Section -->
+      <div id="db-json-container" class="db-json-container">
+        <div class="db-json-header">
+          <span>Active Record JSON:</span>
+          <button id="btn-db-copy-json" class="btn-copy-json" title="Copy JSON">
+            <i data-lucide="copy"></i> Copy
+          </button>
+        </div>
+        <pre class="db-json-pre"><code id="db-json-code">// Select a session row above to inspect the fully branched database structure...</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Database Toggle Button -->
+  <button id="btn-db-toggle" class="btn-db-toggle" title="Toggle Developer Database Inspector">
+    <div class="badge-wrapper">
+      <i data-lucide="database"></i>
+      <span class="db-badge" id="db-badge">0</span>
+    </div>
+    <span class="btn-db-toggle-label">Database Inspector</span>
+  </button>
+
+  <!-- ES6+ Script -->
+  <script src="app.js"></script>
+</body>
+</html>
