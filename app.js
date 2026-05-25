@@ -928,10 +928,35 @@ function renderActiveStep() {
 function updateProgressBar() {
   const fill = document.getElementById('progress-bar-fill');
   const text = document.getElementById('progress-text');
+  const wrapper = document.querySelector('.progress-bar-wrapper');
   
-  // We exclude Page 1 (welcome) and the Roadmap page (final_roadmap) from calculations
-  const totalQuestions = state.activeQueue.filter(key => key !== 'welcome' && key !== 'final_roadmap').length;
-  const currentQuestionIdx = state.activeQueue.indexOf(state.activeQueue[state.currentStepIndex]) - 0; // index offset
+  const nodeKey = state.activeQueue[state.currentStepIndex];
+  const postQuestionnaireNodes = [
+    'profile_life_map',
+    'ai_analysis_loading',
+    'how_we_see_you',
+    'whats_holding_you_back',
+    'what_most_never_realize',
+    'transformation_preview',
+    'final_roadmap'
+  ];
+
+  if (postQuestionnaireNodes.includes(nodeKey)) {
+    if (wrapper) {
+      wrapper.style.opacity = '0';
+      wrapper.style.pointerEvents = 'none';
+    }
+    return;
+  } else {
+    if (wrapper) {
+      wrapper.style.opacity = '1';
+      wrapper.style.pointerEvents = 'auto';
+    }
+  }
+  
+  // We exclude welcome, final_roadmap, and post-questionnaire nodes from active step counts
+  const totalQuestions = state.activeQueue.filter(key => key !== 'welcome' && key !== 'final_roadmap' && !postQuestionnaireNodes.includes(key)).length;
+  const currentQuestionIdx = state.activeQueue.indexOf(state.activeQueue[state.currentStepIndex]); // index offset
   
   const percent = Math.min(100, Math.max(0, (currentQuestionIdx / totalQuestions) * 100));
   
@@ -1860,8 +1885,8 @@ function renderProfileLifeMap(viewWrap) {
         ${sidebarHtml}
       </div>
 
-      <!-- Right Side: Radar Chart Visualizer (Centered Focal Point) -->
-      <div class="map-visualizer-card animate-fade-in centered-map-card">
+      <!-- Right Side: Radar Chart Visualizer (Seamless Floating) -->
+      <div class="lifemap-chart-floating-container animate-fade-in">
         <div class="map-canvas-container">
           <canvas id="life-map-canvas"></canvas>
         </div>
@@ -1883,13 +1908,13 @@ function renderProfileLifeMap(viewWrap) {
 
   // Handle high DPI display for ultra-sharp canvas rendering
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = 500 * dpr;
-  canvas.height = 500 * dpr;
+  canvas.width = 640 * dpr;
+  canvas.height = 640 * dpr;
   ctx.scale(dpr, dpr);
 
-  const cx = 250;
-  const cy = 250;
-  const maxRadius = 160;
+  const cx = 320;
+  const cy = 320;
+  const maxRadius = 225;
   const dimensions = [
     { key: 'body', label: 'BODY' },
     { key: 'mind', label: 'MIND' },
@@ -1908,7 +1933,7 @@ function renderProfileLifeMap(viewWrap) {
   const startTime = performance.now();
 
   function drawRadar(progress) {
-    ctx.clearRect(0, 0, 500, 500);
+    ctx.clearRect(0, 0, 640, 640);
 
     // 1. Draw Concentric Grid Rings (Hexagons)
     const rings = 5;

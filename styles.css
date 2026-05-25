@@ -167,6 +167,7 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  transition: opacity var(--transition-smooth);
 }
 
 .progress-track {
@@ -2217,19 +2218,27 @@ html, body {
   text-shadow: 0 0 12px rgba(255, 69, 58, 0.45);
 }
 
-.centered-map-card {
-  justify-content: center !important;
-  align-items: center !important;
-  min-height: 480px;
+.lifemap-chart-floating-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
 }
 
-.centered-map-card .map-canvas-container {
+.lifemap-chart-floating-container .map-canvas-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   aspect-ratio: 1;
 }
 
 #life-map-canvas {
-  max-width: 500px;
-  max-height: 500px;
+  width: 100%;
+  height: 100%;
+  max-width: 640px;
+  max-height: 640px;
 }
 
 
