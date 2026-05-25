@@ -673,6 +673,22 @@ const ALL_FLOW_NODES = {
     }
   },
 
+  relationships_q4: {
+    type: 'single',
+    title: "What is your biggest psychological bottleneck when dealing with people?",
+    subtitle: "",
+    options: [
+      { id: 'rel_q4_anxiety', text: "Social Anxiety / Overthinking", desc: "Fear of judgment or over-analyzing social interactions.", icon: 'alert-circle' },
+      { id: 'rel_q4_pleasing', text: "People Pleasing / Weak Boundaries", desc: "Sacrificing personal priorities to appease others.", icon: 'shield-alert' },
+      { id: 'rel_q4_validation', text: "Validation Seeking / Status Addiction", desc: "Chasing external approval or social comparison circles.", icon: 'award' },
+      { id: 'rel_q4_unavailability', text: "Emotional Unavailability / Hyper-Independence", desc: "Struggling to let people in or build deep emotional bridges.", icon: 'lock' },
+      { id: 'rel_q4_none', text: "Zero Friction / Fully Calibrated", desc: "Confident, stable, and highly functional interpersonal states.", icon: 'shield-check' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.relationships_q4 = val;
+    }
+  },
+
   // 11. ROUTINE STRUCTURE PAGE (Universal)
   routine: {
     type: 'single',
@@ -1039,7 +1055,7 @@ function buildDynamicQueue() {
     } else {
       dynamicNodes.push('relationships_q2_history');
     }
-    dynamicNodes.push('relationships_q3');
+    dynamicNodes.push('relationships_q3', 'relationships_q4');
   }
 
   const universalEndNodes = [
@@ -2058,6 +2074,20 @@ function calculateLifeMapMetrics() {
       connection -= 15;
     } else if (relQ3 === 'Low-Vibe Circle') {
       connection -= 20;
+    }
+
+    // Q4 Psychological Bottlenecks
+    const relQ4 = flow.relationships_q4 || '';
+    if (relQ4 === 'Social Anxiety / Overthinking') {
+      mind -= 15;
+    } else if (relQ4 === 'People Pleasing / Weak Boundaries') {
+      purpose -= 15;
+    } else if (relQ4 === 'Validation Seeking / Status Addiction') {
+      fuel -= 10;
+    } else if (relQ4 === 'Emotional Unavailability / Hyper-Independence') {
+      connection -= 10;
+    } else if (relQ4 === 'Zero Friction / Fully Calibrated') {
+      mind += 5;
     }
   }
 
