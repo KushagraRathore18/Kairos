@@ -263,6 +263,7 @@ const ALL_FLOW_NODES = {
     ],
     save: (val) => {
       state.sessionData.flow_responses.fitness_gym_no_psych = val;
+      injectGymNoPsychFollowUp(val);
     }
   },
 
@@ -458,28 +459,26 @@ const ALL_FLOW_NODES = {
     save: (val) => { state.sessionData.flow_responses.sleep_support = val; }
   },
   
-  // 10. EATING HABITS FLOW (Dynamic follow-up if Physical Health is chosen)
+  // 10. EATING HABITS FLOW (Universal — runs for every user)
   eating_state: {
     type: 'single',
-    title: 'How would you describe your eating habits?',
-    subtitle: 'Fuel dictates biology, and biology dictates psychology.',
+    title: 'How are your eating habits looking?',
+    subtitle: '',
     options: [
-      { id: 'eat_very_healthy', text: 'Very healthy and balanced', desc: 'Clean eating, macro tracking, organic hydration.', icon: 'check-circle' },
-      { id: 'eat_mostly_healthy', text: 'Mostly healthy', desc: 'Avoid junk food generally, but eat out occasionally.', icon: 'award' },
-      { id: 'eat_mixed', text: 'Mixed diet', desc: 'A balance of home-cooked meals and rapid snacks.', icon: 'activity' },
-      { id: 'eat_too_much_junk', text: 'Too much junk food', desc: 'Sugar cravings, late-night snacking, heavy processing.', icon: 'alert-triangle' },
-      { id: 'eat_no_nutrition', text: 'I barely pay attention to nutrition', desc: 'Eating whatever is fast, cheap, and immediately available.', icon: 'help-circle' }
+      { id: 'eat_clean', text: 'Clean — I mostly eat healthy, whole foods', desc: 'Balanced meals, whole foods, and good hydration most of the time.', icon: 'check-circle' },
+      { id: 'eat_average', text: 'Average — A mix of home food and fast food', desc: 'Neither great nor terrible — somewhere in the middle.', icon: 'meh' },
+      { id: 'eat_unhealthy', text: 'Unhealthy — A lot of junk food and irregular meals', desc: 'Frequent takeout, skipped meals, or heavy processed food.', icon: 'alert-triangle' }
     ],
     save: (val) => { state.sessionData.flow_responses.eating_state = val; }
   },
   eating_support: {
     type: 'single',
-    title: 'Would you like support improving your nutrition habits?',
-    subtitle: 'Simple, non-restrictive meal triggers can yield huge energy returns.',
+    title: 'Do you need help managing your diet or meal schedule?',
+    subtitle: '',
     options: [
-      { id: 'eat_sup_yes', text: 'Yes', desc: 'Embed nutrition habits and simple hydration tracking.', icon: 'check-circle' },
-      { id: 'eat_sup_maybe', text: 'Maybe later', desc: 'I want to focus solely on physical movements first.', icon: 'help-circle' },
-      { id: 'eat_sup_no', text: 'No thanks', desc: 'I have my nutrition fully optimized already.', icon: 'x-circle' }
+      { id: 'eat_help_plan', text: 'Yes, give me a clean meal plan / schedule', desc: 'Build a practical weekly eating structure I can actually follow.', icon: 'calendar' },
+      { id: 'eat_help_track', text: 'Yes, just help me track my calories and protein', desc: 'Simple numbers to guide my food choices every day.', icon: 'bar-chart-2' },
+      { id: 'eat_help_no', text: 'No, my nutrition is completely handled', desc: 'I already eat well and just need to stay consistent.', icon: 'check-circle' }
     ],
     save: (val) => { state.sessionData.flow_responses.eating_support = val; }
   },
@@ -875,57 +874,63 @@ function initializeState() {
 
 function buildDynamicQueue() {
   const chosen = state.sessionData.focus_areas;
-  
-  // Build dynamic nodes array based on focus selections
-  const dynamicNodes = [];
-  
-  // Gym Gate is now UNIVERSAL (Loads immediately after Focus Selection)
-  dynamicNodes.push('fitness_gym_gate');
   const gymGate = state.sessionData.flow_responses.fitness_gym_gate;
+  const noPsych = state.sessionData.flow_responses.fitness_gym_no_psych;
+
+  const dynamicNodes = [];
+
+  // ── MODULE 1: UNIVERSAL GYM & ACTIVITY FLOW ──────────────────────────────
+  // Gate is always shown to every user
+  dynamicNodes.push('fitness_gym_gate');
+
   if (gymGate === 'Yes') {
+    // Yes path: frequency + gym help
     dynamicNodes.push('fitness_gym_frequency', 'fitness_gym_help');
   } else if (gymGate === 'No') {
+    // No path: psychological screen, then conditionally inject help
     dynamicNodes.push('fitness_gym_no_psych');
+    // Follow-up based on what they chose on the psych screen
+    if (noPsych === 'Yes' || noPsych === "Don't want to, but can if that improves my life") {
+      dynamicNodes.push('fitness_gym_help');
+    } else if (noPsych === "I can't, but I can do home workouts") {
+      dynamicNodes.push('fitness_home_help');
+    }
+    // 'No' answer: no follow-up help screen needed
   } else if (gymGate === 'I do home workouts / other workouts') {
+    // Home path: home help screen
     dynamicNodes.push('fitness_home_help');
   }
-  
-  // 1. Physical Health & Fitness Flow
+
+  // ── CONDITIONAL: Physical Health deep-dive ────────────────────────────────
   if (chosen.includes('Physical Health & Fitness')) {
     dynamicNodes.push('fitness_activity', 'fitness_lifestyle', 'fitness_goal', 'fitness_obstacle');
   }
-  
-  // 2. Relationships & Social Life Flow
+
+  // ── Relationships & Social Life Flow ──────────────────────────────────────
   const hasRel = chosen.includes('Relationships & Social Life');
   const hasConf = chosen.includes('Confidence & Self-Esteem');
   if (hasRel || hasConf) {
-    if (hasRel) {
-      dynamicNodes.push('relationship_status');
-    }
+    if (hasRel) dynamicNodes.push('relationship_status');
     dynamicNodes.push('relationships_target', 'relationships_challenge');
   }
-  
-  // 3. Focus & Productivity Flow
+
+  // ── Focus & Productivity Flow ─────────────────────────────────────────────
   if (chosen.includes('Focus & Productivity') || chosen.includes('Education & Learning')) {
     dynamicNodes.push('education_state', 'education_distraction');
   }
-  
-  // 4. Discipline & Consistency Flow
+
+  // ── Discipline & Consistency Flow ─────────────────────────────────────────
   if (chosen.includes('Discipline & Consistency') || chosen.includes('Motivation & Purpose')) {
     dynamicNodes.push('discipline_state', 'discipline_motivation');
   }
-  
-  // 5. Sleep & Energy Flow
-  if (chosen.includes('Sleep & Energy')) {
-    dynamicNodes.push('sleep_state');
-  }
-  
-  // 6. Eating Habits Flow (Only triggers if Physical Health is chosen)
-  if (chosen.includes('Physical Health & Fitness')) {
-    dynamicNodes.push('eating_state', 'eating_support');
-  }
-  
-  // Core universal pages to chain at the end
+
+  // ── MODULE 2: UNIVERSAL SLEEP FLOW (always shown) ─────────────────────────
+  dynamicNodes.push('sleep_state', 'sleep_support');
+
+  // ── MODULE 3: UNIVERSAL EATING FLOW (always shown) ────────────────────────
+  dynamicNodes.push('eating_state', 'eating_support');
+
+  // ── Universal end pages ───────────────────────────────────────────────────
   const universalEndNodes = [
     'routine',
     'reflection_progress',
@@ -946,8 +951,7 @@ function buildDynamicQueue() {
     'transformation_preview',
     'final_roadmap'
   ];
-  
-  // Re-build active queue: Base initial queue + dynamic selections + ending pages
+
   state.activeQueue = [
     'welcome',
     'basic_info',
@@ -958,13 +962,27 @@ function buildDynamicQueue() {
   ];
 }
 
-// Injects Sleep support follow-up dynamically after the sleep_state page
-function injectSleepSupportNode() {
-  const currentIndex = state.activeQueue.indexOf('sleep_state');
-  if (currentIndex !== -1 && !state.activeQueue.includes('sleep_support')) {
-    state.activeQueue.splice(currentIndex + 1, 0, 'sleep_support');
+// Injects gym/home help screen after the No-psych screen at runtime
+function injectGymNoPsychFollowUp(val) {
+  const psychIndex = state.activeQueue.indexOf('fitness_gym_no_psych');
+  if (psychIndex === -1) return;
+
+  // Remove any stale gym/home help nodes that may already be queued right after
+  const nextNode = state.activeQueue[psychIndex + 1];
+  if (nextNode === 'fitness_gym_help' || nextNode === 'fitness_home_help') {
+    state.activeQueue.splice(psychIndex + 1, 1);
+  }
+
+  // Inject the correct follow-up based on selection
+  if (val === 'Yes' || val === "Don't want to, but can if that improves my life") {
+    state.activeQueue.splice(psychIndex + 1, 0, 'fitness_gym_help');
+  } else if (val === "I can't, but I can do home workouts") {
+    state.activeQueue.splice(psychIndex + 1, 0, 'fitness_home_help');
   }
 }
+
+// Legacy stub — kept for safety; sleep_support is now always in the queue
+function injectSleepSupportNode() { /* no-op: sleep_support is always queued */ }
 
 // --- Active Node Page Router & Render Engine ---
 let _isTransitioning = false; // Lock flag — prevents concurrent double-renders
@@ -1873,13 +1891,12 @@ function calculateLifeMapMetrics() {
 
   // FUEL calculation (Base 35, Max 100)
   let fuel = 35;
-  if (flow.eating_state === 'healthy_balanced') fuel += 35;
-  else if (flow.eating_state === 'mostly_clean') fuel += 25;
-  else if (flow.eating_state === 'mixed_diet') fuel += 15;
-  else if (flow.eating_state === 'struggle_junk') fuel += 5;
+  if (flow.eating_state === 'Clean — I mostly eat healthy, whole foods') fuel += 35;
+  else if (flow.eating_state === 'Average — A mix of home food and fast food') fuel += 18;
+  else if (flow.eating_state === 'Unhealthy — A lot of junk food and irregular meals') fuel += 5;
 
-  if (flow.eating_support === 'No, I have it under control') fuel += 15;
-  else if (flow.eating_support === 'Yes, small improvements') fuel += 8;
+  if (flow.eating_support === 'No, my nutrition is completely handled') fuel += 15;
+  else if (flow.eating_support === 'Yes, just help me track my calories and protein') fuel += 8;
 
   if (flow.fitness_goal === 'fit_goal_healthy' || flow.fitness_goal === 'fit_goal_stamina') fuel += 15;
   fuel = Math.min(100, fuel);
