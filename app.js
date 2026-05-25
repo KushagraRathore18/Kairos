@@ -3643,16 +3643,60 @@ function renderUserDashboard(viewWrap) {
 
   // Reset retake diagnostic button
   viewWrap.querySelector('#btn-dashboard-reset').addEventListener('click', () => {
+    // 1. Explicitly clear all local and session tracking hooks
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // 2. Clear IndexedDB storage securely
     clearDatabase()
       .then(() => {
+        // 3. Force-reset the core wizard progress state context back to starting values
         initializeState();
-        renderActiveStep();
-        showNotification("Diagnostic reset. Database cleaned.");
+        state.currentStepIndex = 0;
+        state.sessionData = {
+          id: 'session_' + Date.now(),
+          timestamp: new Date().toISOString(),
+          basic_info: {
+            first_name: '',
+            age: 25,
+            gender: '',
+            country: '',
+            occupation: '',
+            relationship_status: '',
+            activity_level: ''
+          },
+          life_state: '',
+          focus_areas: [],
+          flow_responses: {},
+          general_responses: {},
+          generated_roadmap: {},
+          dashboard_offers: {}
+        };
+
+        // 4. Hard clean unmount of the dashboard container
+        const container = document.getElementById('app-container');
+        if (container) {
+          container.className = 'app-container';
+          container.innerHTML = ''; // Clear all dashboard DOM elements instantly
+        }
+
+        // 5. Force reload to guarantee a clean starting state
+        window.location.reload();
       })
       .catch(err => {
         console.error("Failed to clear DB, resetting in memory:", err);
+        
+        // Fallback clean unmount and reload sequence
         initializeState();
-        renderActiveStep();
+        state.currentStepIndex = 0;
+        
+        const container = document.getElementById('app-container');
+        if (container) {
+          container.className = 'app-container';
+          container.innerHTML = '';
+        }
+        
+        window.location.reload();
       });
   });
 
