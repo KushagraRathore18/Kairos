@@ -222,6 +222,48 @@ const ALL_FLOW_NODES = {
   },
   
   // 5. HEALTH & FITNESS FLOW
+  fitness_gym_gate: {
+    type: 'single',
+    title: 'Do you go to the gym?',
+    subtitle: 'This calibrates the exact physical space of your training routines.',
+    options: [
+      { id: 'fit_gym_yes', text: 'Yes', desc: 'I have access to a commercial gym or dedicated training facility.', icon: 'check-circle' },
+      { id: 'fit_gym_no', text: 'No', desc: 'I train at home, outdoors, or am currently inactive.', icon: 'x-circle' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.fitness_gym_gate = val;
+      buildDynamicQueue();
+    }
+  },
+  
+  fitness_gym_frequency: {
+    type: 'single',
+    title: 'How frequently do you go to the gym?',
+    subtitle: 'Consistency defines momentum. Select your weekly commitment level.',
+    options: [
+      { id: 'fit_freq_1_2', text: '1-2 days / week', desc: 'Maintenance volume or starting routine.', icon: 'calendar' },
+      { id: 'fit_freq_3_4', text: '3-4 days / week', desc: 'Active momentum, typical for strength or hypertrophic routines.', icon: 'activity' },
+      { id: 'fit_freq_5_plus', text: '5+ days / week', desc: 'Elite commitment, athletic split or highly active lifestyle.', icon: 'zap' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.fitness_gym_frequency = val;
+    }
+  },
+  
+  fitness_gym_no_psych: {
+    type: 'single',
+    title: 'Do you want to go? Could you?',
+    subtitle: '<span class="split-desc-line">1. Do you want to go to the gym?</span><span class="split-desc-line" style="margin-top: 4px; display: block;">2. Could you go to the gym?</span>',
+    options: [
+      { id: 'fit_psych_yes', text: 'Yes', desc: 'I desire to go, and I have the logistical capability to make it happen.', icon: 'heart' },
+      { id: 'fit_psych_no', text: 'No', desc: 'I do not wish to go, and I am content with my current movement scope.', icon: 'slash' },
+      { id: 'fit_psych_conditional', text: "Don't want to, but can if that improves my life", desc: 'Open to expanding comfort zone if stoichiometric evidence warrants it.', icon: 'sparkles' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.fitness_gym_no_psych = val;
+    }
+  },
+  
   fitness_lifestyle: {
     type: 'single',
     title: 'What best describes your current fitness lifestyle?',
@@ -816,7 +858,14 @@ function buildDynamicQueue() {
   
   // 1. Physical Health & Fitness Flow
   if (chosen.includes('Physical Health & Fitness')) {
-    dynamicNodes.push('fitness_activity', 'fitness_lifestyle', 'fitness_goal', 'fitness_obstacle');
+    dynamicNodes.push('fitness_activity', 'fitness_gym_gate');
+    const gymGate = state.sessionData.flow_responses.fitness_gym_gate;
+    if (gymGate === 'Yes') {
+      dynamicNodes.push('fitness_gym_frequency');
+    } else if (gymGate === 'No') {
+      dynamicNodes.push('fitness_gym_no_psych');
+    }
+    dynamicNodes.push('fitness_lifestyle', 'fitness_goal', 'fitness_obstacle');
   }
   
   // 2. Relationships & Social Life Flow
@@ -1734,19 +1783,34 @@ function calculateLifeMapMetrics() {
   const focus = state.sessionData.focus_areas || [];
   const stateVal = state.sessionData.life_state || [];
 
-  // BODY calculation (Base 35, Max 100)
-  let body = 35;
-  if (flow.fitness_lifestyle === 'fit_gym_consistent') body += 20;
-  else if (flow.fitness_lifestyle === 'fit_workout_occasion') body += 12;
-  else if (flow.fitness_lifestyle === 'fit_struggle_consistent') body += 6;
+  // BODY calculation (Base 30, Max 100)
+  let body = 30;
   
-  if (info.activity_level === 'Very Active') body += 20;
-  else if (info.activity_level === 'Moderately Active') body += 14;
-  else if (info.activity_level === 'Lightly Active') body += 8;
+  // Gym Gate Branch Calculations
+  const gymGate = flow.fitness_gym_gate;
+  if (gymGate === 'Yes') {
+    const freq = flow.fitness_gym_frequency;
+    if (freq === '5+ days / week') body += 22;
+    else if (freq === '3-4 days / week') body += 15;
+    else if (freq === '1-2 days / week') body += 8;
+  } else if (gymGate === 'No') {
+    const psych = flow.fitness_gym_no_psych;
+    if (psych === 'Yes') body += 10;
+    else if (psych === "Don't want to, but can if that improves my life") body += 14;
+    else if (psych === 'No') body += 4;
+  }
 
-  if (flow.eating_state === 'healthy_balanced') body += 15;
-  else if (flow.eating_state === 'mostly_clean') body += 10;
-  else if (flow.eating_state === 'mixed_diet') body += 5;
+  if (flow.fitness_lifestyle === 'fit_gym_consistent') body += 18;
+  else if (flow.fitness_lifestyle === 'fit_workout_occasion') body += 10;
+  else if (flow.fitness_lifestyle === 'fit_struggle_consistent') body += 5;
+  
+  if (info.activity_level === 'Very Active') body += 18;
+  else if (info.activity_level === 'Moderately Active') body += 12;
+  else if (info.activity_level === 'Lightly Active') body += 6;
+
+  if (flow.eating_state === 'healthy_balanced') body += 12;
+  else if (flow.eating_state === 'mostly_clean') body += 8;
+  else if (flow.eating_state === 'mixed_diet') body += 4;
 
   if (focus.includes('Physical Health & Fitness')) body += 10;
   body = Math.min(100, body);

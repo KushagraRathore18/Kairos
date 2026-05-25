@@ -428,6 +428,15 @@ html, body {
   line-height: 1.5;
 }
 
+.split-desc-line {
+  display: block;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
 /* --- PAGE 2: BASIC INFO FORM --- */
 .form-grid {
   display: grid;
@@ -1088,6 +1097,7 @@ html, body {
 
 /* Floating Database Inspector Trigger */
 .btn-db-toggle {
+  display: none !important; /* Completely hidden for clean production layout */
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -1100,7 +1110,6 @@ html, body {
   backdrop-filter: blur(15px);
   z-index: 100;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  display: flex;
   align-items: center;
   gap: 10px;
   font-family: var(--font-body);
