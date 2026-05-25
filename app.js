@@ -219,36 +219,67 @@ const ALL_FLOW_NODES = {
   },
   
   // 1. GYM & FITNESS TRAINING (Strictly Conditional)
-  fitness_gym_gate: {
+  gym_q1: {
     type: 'single',
-    title: 'Do you go to the gym?',
-    subtitle: '',
+    title: "What does your current workout environment look like?",
+    subtitle: "",
     options: [
-      { id: 'fit_gym_yes', text: 'Yes, I have access to a commercial gym or dedicated facility.', desc: 'Full commercial or home gym setup with weights and equipment.', icon: 'check-circle' },
-      { id: 'fit_gym_no', text: 'No, I am currently inactive or not engaged in structured workouts.', desc: 'Inactive style or looking to establish a basic movement baseline.', icon: 'x-circle' },
-      { id: 'fit_gym_home', text: 'I do home workouts / bodyweight routines.', desc: 'Training in my own space with minimal or bodyweight equipment.', icon: 'home' }
+      { id: 'gym_q1_comm', text: "I go to a commercial gym facility.", desc: "Access to machines, free weights, and dedicated lifting spaces.", icon: 'building' },
+      { id: 'gym_q1_home', text: "I do home workouts / bodyweight routines.", desc: "Training in your own space with minimal or bodyweight equipment.", icon: 'home' },
+      { id: 'gym_q1_inactive', text: "I am currently completely inactive.", desc: "Looking to build standard movement habits from scratch.", icon: 'coffee' }
     ],
     save: (val) => {
-      state.sessionData.flow_responses.fitness_gym_gate = val;
-      buildDynamicQueue();
+      state.sessionData.flow_responses.gym_q1 = val;
     }
   },
   
-  fitness_gym_help: {
+  gym_q2: {
     type: 'single',
-    title: 'Do you need help with your gym workout or schedule?',
-    subtitle: '',
-    options: [
-      { id: 'gym_help_schedule', text: 'Yes, I need a solid workout schedule.', desc: 'Map out a structured split matching my available training days.', icon: 'calendar' },
-      { id: 'gym_help_exercises', text: 'Yes, I need help with exercises / form.', desc: 'Instruction, biomechanics, and safety targets for key lifts.', icon: 'activity' },
-      { id: 'gym_help_no', text: 'No, my gym routine is locked in.', desc: 'I have a plan and just need accountability to execute consistently.', icon: 'check-circle' }
-    ],
+    get title() {
+      const q1 = state.sessionData.flow_responses.gym_q1 || '';
+      if (q1.includes('inactive')) {
+        return "Would you like to train at a gym or at home?";
+      } else {
+        return "How many days a week do you want to train?";
+      }
+    },
+    subtitle: "",
+    get options() {
+      const q1 = state.sessionData.flow_responses.gym_q1 || '';
+      if (q1.includes('inactive')) {
+        return [
+          { id: 'gym_q2_inactive_comm', text: "Commercial Gym", desc: "Access to machines, free weights, and dedicated lifting spaces.", icon: 'dumbbell' },
+          { id: 'gym_q2_inactive_home', text: "Home Workouts", desc: "Training in your own space with minimal or bodyweight equipment.", icon: 'home' }
+        ];
+      } else {
+        return [
+          { id: 'gym_q2_active_3d', text: "3 Days", desc: "A sustainable three-day weekly routine ideal for solid progress.", icon: 'calendar' },
+          { id: 'gym_q2_active_45d', text: "4-5 Days", desc: "A higher frequency training plan for advanced performance.", icon: 'zap' }
+        ];
+      }
+    },
     save: (val) => {
-      state.sessionData.flow_responses.fitness_gym_help = val;
+      state.sessionData.flow_responses.gym_q2 = val;
+    }
+  },
+
+  gym_q3: {
+    type: 'multiple',
+    get title() {
+      const username = state.sessionData.basic_info.first_name || 'my friend';
+      return `Alright ${username}, if we're setting up your physical training loop, where do you need guidance?`;
+    },
+    subtitle: "",
+    options: [
+      { id: 'gym_q3_sched', text: "I need an absolute weapon of a workout schedule built for my calendar.", desc: "Structured splits designed around your weekly availability.", icon: 'calendar' },
+      { id: 'gym_q3_mech', text: "I want to fix my exercise mechanics, form, and lifting execution.", desc: "Detailed form instruction and alignment blueprints.", icon: 'activity' }
+    ],
+    save: (vals) => {
+      state.sessionData.flow_responses.gym_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (val.includes('Yes, I need a solid workout schedule.')) {
+      if (vals.includes("I need an absolute weapon of a workout schedule built for my calendar.")) {
         state.sessionData.dashboard_offers.fitness = 'Custom Training Split Generator';
-      } else if (val.includes('Yes, I need help with exercises / form.')) {
+      } else if (vals.includes("I want to fix my exercise mechanics, form, and lifting execution.")) {
         state.sessionData.dashboard_offers.fitness = 'Exercise Mechanics Library';
       } else {
         state.sessionData.dashboard_offers.fitness = 'Accountability & Consistency Engine';
@@ -256,73 +287,139 @@ const ALL_FLOW_NODES = {
     }
   },
 
-  diet_nutrition_diagnostic: {
+  // 2. DIET & NUTRITION BALANCE (Conditional)
+  diet_q1: {
     type: 'single',
-    title: 'What usually disrupts your nutrition consistency?',
-    subtitle: '',
+    title: "How would you describe your current eating habits?",
+    subtitle: "",
     options: [
-      { id: 'diet_tracking', text: 'Food Tracking Friction — I start logging calories but give up because tracking is too tedious.', desc: 'TEDIOUS LOGGING. Need a fast, frictionless way to log nutritional baselines.', icon: 'alert-triangle' },
-      { id: 'diet_time', text: 'Time & Preparation — I want to eat clean, but meal prepping takes too much time.', desc: 'PREP RESISTANCE. Busy schedule conflicts with elaborate cooking routines.', icon: 'clock' },
-      { id: 'diet_crash', text: 'Inconsistent Choices — I eat well for a few days, then crash into junk food/takeout cycles.', desc: 'CHOICE CYCLES. Sticking to eating habits under pressure or mood dips.', icon: 'rotate-cw' }
+      { id: 'diet_q1_convenient', text: "I eat whatever is convenient (takeout/fast food).", desc: "High reliance on external meals, takeout, or processed options.", icon: 'coffee' },
+      { id: 'diet_q1_no_struct', text: "I try to eat clean but have no structure.", desc: "Healthy intentions but inconsistent meal times or selections.", icon: 'compass' },
+      { id: 'diet_q1_optimize', text: "I track meals but want to optimize.", desc: "Already tracking nutrition but looking to maximize biological leverage.", icon: 'trending-up' }
     ],
     save: (val) => {
-      state.sessionData.flow_responses.diet_nutrition_diagnostic = val;
+      state.sessionData.flow_responses.diet_q1 = val;
+    }
+  },
+
+  diet_q2: {
+    type: 'single',
+    title: "What is the biggest obstacle stopping you from eating clean?",
+    subtitle: "",
+    options: [
+      { id: 'diet_q2_time', text: "Lack of time for meal prep and cooking.", desc: "PREP RESISTANCE. Busy schedules conflict with standard home cooking.", icon: 'clock' },
+      { id: 'diet_q2_friction', text: "The tedious friction of counting calories/macros.", desc: "LOGGING FRICTION. You start counting but give up because tracking is tedious.", icon: 'alert-triangle' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.diet_q2 = val;
+    }
+  },
+
+  diet_q3: {
+    type: 'multiple',
+    title: "Nutrition is half the battle. How do you want us to handle your fuel?",
+    subtitle: "",
+    options: [
+      { id: 'diet_q3_quick_log', text: "Give me a fast, frictionless tool to log food without counting stress.", desc: "AI single-sentence log, avoiding tedious manual typing.", icon: 'zap' },
+      { id: 'diet_q3_blueprint', text: "Lock in a rock-solid, easy macro blueprint customized for my body.", desc: "Easy macro blueprints custom-built for your body type.", icon: 'shield' }
+    ],
+    save: (vals) => {
+      state.sessionData.flow_responses.diet_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (val.includes('Food Tracking Friction')) {
+      if (vals.includes("Give me a fast, frictionless tool to log food without counting stress.")) {
         state.sessionData.dashboard_offers.nutrition = 'AI Single-Sentence Quick-Log Widget';
-        state.sessionData.flow_responses.eating_state = 'Average — A mix of home food and fast food';
-        state.sessionData.flow_responses.eating_support = 'Yes, just help me track my calories and protein';
-      } else if (val.includes('Time & Preparation')) {
-        state.sessionData.dashboard_offers.nutrition = '15-Minute Macro-Meal Builder Blueprint';
-        state.sessionData.flow_responses.eating_state = 'Clean — I mostly eat healthy, whole foods';
-        state.sessionData.flow_responses.eating_support = 'No, my nutrition is completely handled';
       } else {
-        state.sessionData.dashboard_offers.nutrition = 'Weekly Caloric Buffer & Reset Engine';
-        state.sessionData.flow_responses.eating_state = 'Clean — I mostly eat healthy, whole foods';
-        state.sessionData.flow_responses.eating_support = 'No, my nutrition is completely handled';
+        state.sessionData.dashboard_offers.nutrition = '15-Minute Macro-Meal Builder Blueprint';
       }
     }
   },
 
-  sleep_circadian_diagnostic: {
+  // 3. SLEEP & CIRCADIAN RHYTHM (Conditional)
+  sleep_q1: {
     type: 'single',
-    title: 'Where does your sleep cycle break down the most?',
-    subtitle: '',
+    title: "What does your current sleep schedule look like?",
+    subtitle: "",
     options: [
-      { id: 'sleep_revenge', text: 'Revenge Bedtime Procrastination — I stay up late scrolling on my phone even when exhausted.', desc: 'DIGITAL LOOPS. Bedtime scrolling keeps neural stimulation running high.', icon: 'smartphone' },
-      { id: 'sleep_inertia', text: 'Morning Inertia — I struggle intensely to wake up and hit the snooze button for an hour.', desc: 'SNOOZE CYCLES. Waking up in fog, delaying starting daily actions.', icon: 'alert-circle' },
-      { id: 'sleep_disruption', text: 'Sleep Disruption — I wake up in the middle of the night or feel tired despite 8 hours.', desc: 'QUALITY LEAKS. Quality is poor, leading to midday fatigue and low drive.', icon: 'battery-low' }
+      { id: 'sleep_q1_chaotic', text: "Completely chaotic — sleep times change daily.", desc: "Fluctuating sleep-wake boundaries causing heavy fatigue cycles.", icon: 'shuffle' },
+      { id: 'sleep_q1_fixed_tired', text: "Somewhat fixed, but I feel tired all day.", desc: "Fixed schedule but poor quality, leaving you depleted.", icon: 'battery-low' }
     ],
     save: (val) => {
-      state.sessionData.flow_responses.sleep_circadian_diagnostic = val;
-      state.sessionData.flow_responses.sleep_state = val.includes('Sleep Disruption') ? 'Pretty bad — always tired' : 'Hit or miss — depends on the night';
+      state.sessionData.flow_responses.sleep_q1 = val;
+    }
+  },
+
+  sleep_q2: {
+    type: 'single',
+    title: "Where does your nighttime routine break down the most?",
+    subtitle: "",
+    options: [
+      { id: 'sleep_q2_scrolling', text: "Revenge bedtime procrastination (phone scrolling).", desc: "Late-night neural stimulation blocking melatonin release.", icon: 'smartphone' },
+      { id: 'sleep_q2_quality', text: "Waking up in the night / poor sleep quality.", desc: "Frequent sleep fragmentation, waking up in exhaustion.", icon: 'moon' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.sleep_q2 = val;
+    }
+  },
+
+  sleep_q3: {
+    type: 'multiple',
+    title: "Let's fix your energy levels. What is the ultimate goal for your sleep?",
+    subtitle: "",
+    options: [
+      { id: 'sleep_q3_reset', text: "Resetting my biological clock so I wake up energized without an alarm.", desc: "Waking up in optimal REM windows with somatic checklists.", icon: 'sun' },
+      { id: 'sleep_q3_winddown', text: "Building an unbreakable, screen-free wind-down routine at night.", desc: "Digital sunset screen-lock protocols and wind-down tools.", icon: 'lock' }
+    ],
+    save: (vals) => {
+      state.sessionData.flow_responses.sleep_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (val.includes('Revenge Bedtime Procrastination')) {
-        state.sessionData.dashboard_offers.sleep = 'Digital Sunset Screen-Lock Protocol';
-      } else if (val.includes('Morning Inertia')) {
+      if (vals.includes("Resetting my biological clock so I wake up energized without an alarm.")) {
         state.sessionData.dashboard_offers.sleep = 'Immediate Action Morning Light & Somatic Checklist';
       } else {
-        state.sessionData.dashboard_offers.sleep = 'Optimized Circadian REM Window Calculator';
+        state.sessionData.dashboard_offers.sleep = 'Digital Sunset Screen-Lock Protocol';
       }
     }
   },
 
-  focus_discipline_diagnostic: {
+  // 4. FOCUS, DISCIPLINE & STUDY (Conditional)
+  study_q1: {
     type: 'single',
-    title: 'What is the primary killer of your study or deep work sessions?',
-    subtitle: '',
+    title: "How many hours of focused study do you hit daily?",
+    subtitle: "",
     options: [
-      { id: 'focus_friction', text: 'Overwhelming Friction — I delay starting tough study tasks until the absolute last minute.', desc: 'PROCRASTINATION. The starting resistance blocks high-value work blocks.', icon: 'clock' },
-      { id: 'focus_switching', text: 'Tab/Context Switching — I lose focus every 10–15 minutes by checking social media or other tabs.', desc: 'ATTENTION FRAGMENTATION. Small notification triggers drain battery.', icon: 'smartphone' },
-      { id: 'focus_burnout', text: 'Energy Burnout — I start with huge motivation, study for 6 hours straight, then crash for a week.', desc: 'FATIGUE CYCLES. Unsustainable pacing depletes your cognitive fuel.', icon: 'flame' }
+      { id: 'study_q1_less_2', text: "Less than 2 hours — I struggle to lock in.", desc: "Heavy friction starting study sessions, low daily focus volume.", icon: 'clock' },
+      { id: 'study_q1_2_5', text: "2 to 5 hours — I work with interruptions.", desc: "Decent duration but fragmented by regular context switches.", icon: 'smartphone' },
+      { id: 'study_q1_more_5', text: "5+ hours — I study heavily but feel inefficient.", desc: "High hours, but suffering from diminishing returns and fatigue.", icon: 'battery-low' }
     ],
     save: (val) => {
-      state.sessionData.flow_responses.focus_discipline_diagnostic = val;
-      state.sessionData.flow_responses.discipline_state = val.includes('Overwhelming Friction') ? 'struggle_consistency' : (val.includes('Tab/Context Switching') ? 'mostly_consistent' : 'highly_disciplined');
+      state.sessionData.flow_responses.study_q1 = val;
+    }
+  },
+
+  study_q2: {
+    type: 'single',
+    title: "What completely destroys your focus during a session?",
+    subtitle: "",
+    options: [
+      { id: 'study_q2_friction', text: "Task activation friction (procrastinating on starting).", desc: "Avoiding complex tasks until the absolute final hour.", icon: 'alert-circle' },
+      { id: 'study_q2_switching', text: "Context switching (checking phone tabs/social media).", desc: "Checking notifications or other browser tabs every 10 minutes.", icon: 'smartphone' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.study_q2 = val;
+    }
+  },
+
+  study_q3: {
+    type: 'multiple',
+    title: "To crush your studies and deep work sessions, what do you need in your corner?",
+    subtitle: "",
+    options: [
+      { id: 'study_q3_vault', text: "A high-focus digital vault to lock down my sessions and block out tabs.", desc: "Focus vaults and browser shield structures.", icon: 'lock' },
+      { id: 'study_q3_pacing', text: "A sustainable pacing system so I study hard without burning out.", desc: "Study-to-rest optimal ratio protocols.", icon: 'activity' }
+    ],
+    save: (vals) => {
+      state.sessionData.flow_responses.study_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (val.includes('Overwhelming Friction')) {
-        state.sessionData.dashboard_offers.focus = '5-Minute Mindset Activation Timer';
-      } else if (val.includes('Tab/Context Switching')) {
+      if (vals.includes("A high-focus digital vault to lock down my sessions and block out tabs.")) {
         state.sessionData.dashboard_offers.focus = 'AI Time-Block Focus Vault';
       } else {
         state.sessionData.dashboard_offers.focus = 'Sustainable Study-to-Rest Pacing Protocol';
@@ -330,48 +427,94 @@ const ALL_FLOW_NODES = {
     }
   },
 
-  mental_health_diagnostic: {
+  // 5. MENTAL HEALTH & INNER PEACE (Conditional)
+  mental_q1: {
     type: 'single',
-    title: 'How does daily stress or overthinking manifest in your routine?',
-    subtitle: '',
+    title: "How often does daily stress paralyze your routine?",
+    subtitle: "",
     options: [
-      { id: 'mental_paralysis', text: 'Analysis Paralysis — Overanalyzing choices, paralyzing my ability to take action.', desc: 'MIND STATIC. Anxiety about making the right choice blocks actual progress.', icon: 'brain' },
-      { id: 'mental_low_energy', text: 'Chronic Low Energy — Feeling mentally exhausted, drained, or running on empty.', desc: 'BATTERY DEPLETED. Cognitive overload blocks physical active drive.', icon: 'battery-low' },
-      { id: 'mental_reactivity', text: 'Emotional Reactivity — Easily frustrated or anxious when plans change or obstacles happen.', desc: 'FLEXIBILITY SHADOWS. Daily stress loops lower threshold for irritation.', icon: 'alert-triangle' }
+      { id: 'mental_q1_constant', text: "Constantly — overthinking stops me from acting.", desc: "Analysis paralysis keeping your actions locked in overthinking.", icon: 'brain' },
+      { id: 'mental_q1_occasional', text: "Occasionally — I execute but feel mentally drained.", desc: "Getting things done but carrying heavy cognitive stress daily.", icon: 'battery-low' }
     ],
     save: (val) => {
-      state.sessionData.flow_responses.mental_health_diagnostic = val;
+      state.sessionData.flow_responses.mental_q1 = val;
+    }
+  },
+
+  mental_q2: {
+    type: 'single',
+    title: "What triggers your mental fatigue the most?",
+    subtitle: "",
+    options: [
+      { id: 'mental_q2_changes', text: "Unexpected changes in my daily plans.", desc: "Frustration and anxiety spikes when external events disrupt schedules.", icon: 'alert-triangle' },
+      { id: 'mental_q2_chaotic', text: "A chaotic physical and digital environment.", desc: "Sensory clutter in your workspace or device draining your drive.", icon: 'shuffle' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.mental_q2 = val;
+    }
+  },
+
+  mental_q3: {
+    type: 'multiple',
+    title: "When overthinking hits or things get chaotic, how are we clearing your mind?",
+    subtitle: "",
+    options: [
+      { id: 'mental_q3_breathwork', text: "Give me quick, 5-minute breathwork protocols to drop my stress instantly.", desc: "Physiological sigh and nervous system down-regulation (NSDR).", icon: 'wind' },
+      { id: 'mental_q3_brain_dump', text: "Give me a rapid mental clarity tool to dump my thoughts and stay sharp.", desc: "Brain-dump clarity blueprint filters to extract priority actions.", icon: 'copy' }
+    ],
+    save: (vals) => {
+      state.sessionData.flow_responses.mental_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (val.includes('Analysis Paralysis')) {
-        state.sessionData.dashboard_offers.mental = 'Brain-Dump Clarity Blueprint (3-Item Action List)';
-      } else if (val.includes('Chronic Low Energy')) {
+      if (vals.includes("Give me quick, 5-minute breathwork protocols to drop my stress instantly.")) {
         state.sessionData.dashboard_offers.mental = 'Nervous System Down-Regulation (NSDR) Recovery Hub';
       } else {
-        state.sessionData.dashboard_offers.mental = 'Daily Stoic Resilience Reflection Grounding Box';
+        state.sessionData.dashboard_offers.mental = 'Brain-Dump Clarity Blueprint (3-Item Action List)';
       }
     }
   },
 
-  relationships_social_diagnostic: {
+  // 6. RELATIONSHIPS & SOCIAL LIFE (Conditional)
+  relationships_q1: {
     type: 'single',
-    title: 'What is your main priority for your social environment right now?',
-    subtitle: '',
+    title: "How satisfied are you with your social circle right now?",
+    subtitle: "",
     options: [
-      { id: 'social_connection', text: 'Quality Connection — I am around people, but I lack deep, meaningful, value-aligned friendships.', desc: 'SHALLOW NETWORKS. Surrounding circles lack deep, aligned drivers.', icon: 'users' },
-      { id: 'social_battery', text: 'Social Battery Management — I overcommit and feel drained by over-socializing or toxic crowds.', desc: 'BOUNDARIES GAP. Struggle to shield focus blocks from social leakage.', icon: 'battery-charging' },
-      { id: 'social_checkins', text: 'Consistency & Check-ins — I neglect my close family or friends due to tight study schedules.', desc: 'NEGLECT LOOPS. Task focus isolates you from supportive circles.', icon: 'heart' }
+      { id: 'rel_q1_isolated', text: "Isolated — focusing on goals made me neglect people.", desc: "Focusing heavily on goals isolated you from key personal connections.", icon: 'user' },
+      { id: 'rel_q1_no_deep', text: "Surrounded by people, but lacking deep bonds.", desc: "Lack of deep, meaningful, values-aligned partnerships or friends.", icon: 'users' }
     ],
     save: (val) => {
-      state.sessionData.flow_responses.relationships_social_diagnostic = val;
-      state.sessionData.flow_responses.relationships_challenge = val.includes('Quality Connection') ? 'rel_communication' : (val.includes('Social Battery Management') ? 'rel_no_time' : 'rel_none');
-      state.sessionData.flow_responses.relationships_target = ['Family & Friends'];
+      state.sessionData.flow_responses.relationships_q1 = val;
+    }
+  },
+
+  relationships_q2: {
+    type: 'single',
+    title: "What is your main struggle with maintaining relationships?",
+    subtitle: "",
+    options: [
+      { id: 'rel_q2_forget', text: "I simply forget to check in consistently.", desc: "Neglecting relationships due to intense work focus loops.", icon: 'clock' },
+      { id: 'rel_q2_drain', text: "Socializing completely drains my focus energy.", desc: "Struggling to balance focus blocks and boundary limits.", icon: 'battery-low' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.relationships_q2 = val;
+    }
+  },
+
+  relationships_q3: {
+    type: 'multiple',
+    title: "We need to protect your social battery. What are we optimizing here?",
+    subtitle: "",
+    options: [
+      { id: 'rel_q3_reminders', text: "A smart reminder loop so I never neglect my closest family and friends.", desc: "Inner circle check-in scheduling reminders.", icon: 'calendar' },
+      { id: 'rel_q3_boundaries', text: "A strict boundary-setting tool to balance social time with my focus blocks.", desc: "Social capacity and boundary tracking blueprints.", icon: 'lock' }
+    ],
+    save: (vals) => {
+      state.sessionData.flow_responses.relationships_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (val.includes('Quality Connection')) {
-        state.sessionData.dashboard_offers.social = 'Social Networking & Value Alignment Tracker';
-      } else if (val.includes('Social Battery Management')) {
-        state.sessionData.dashboard_offers.social = 'Boundary-Setting & Social Capacity Protocol';
-      } else {
+      if (vals.includes("A smart reminder loop so I never neglect my closest family and friends.")) {
         state.sessionData.dashboard_offers.social = 'Inner Circle Automation Reminders';
+      } else {
+        state.sessionData.dashboard_offers.social = 'Boundary-Setting & Social Capacity Protocol';
       }
     }
   },
@@ -767,42 +910,36 @@ function initializeState() {
 
 function buildDynamicQueue() {
   const chosen = state.sessionData.focus_areas || [];
-  const gymGate = state.sessionData.flow_responses.fitness_gym_gate;
-
   const dynamicNodes = [];
 
-  // 1. Gym & Fitness Training (Conditional on choosing 'Gym & Fitness Training')
+  // 1. Gym & Fitness Training
   if (chosen.includes('Gym & Fitness Training')) {
-    dynamicNodes.push('fitness_gym_gate');
-    // If Yes (Option A) or Home (Option C) is selected, we conditionally push fitness_gym_help
-    if (gymGate && (gymGate.includes('Yes') || gymGate.includes('home workouts'))) {
-      dynamicNodes.push('fitness_gym_help');
-    }
+    dynamicNodes.push('gym_q1', 'gym_q2', 'gym_q3');
   }
 
-  // 2. Diet & Nutrition Balance (Conditional on choosing 'Diet & Nutrition Balance')
+  // 2. Diet & Nutrition Balance
   if (chosen.includes('Diet & Nutrition Balance')) {
-    dynamicNodes.push('diet_nutrition_diagnostic');
+    dynamicNodes.push('diet_q1', 'diet_q2', 'diet_q3');
   }
 
-  // 3. Sleep & Circadian Rhythm (Conditional on choosing 'Sleep & Circadian Rhythm')
+  // 3. Sleep & Circadian Rhythm
   if (chosen.includes('Sleep & Circadian Rhythm')) {
-    dynamicNodes.push('sleep_circadian_diagnostic');
+    dynamicNodes.push('sleep_q1', 'sleep_q2', 'sleep_q3');
   }
 
-  // 4. Focus, Discipline & Study (Conditional on choosing 'Focus, Discipline & Study')
+  // 4. Focus, Discipline & Study
   if (chosen.includes('Focus, Discipline & Study')) {
-    dynamicNodes.push('focus_discipline_diagnostic');
+    dynamicNodes.push('study_q1', 'study_q2', 'study_q3');
   }
 
-  // 5. Mental Health & Inner Peace (Conditional on choosing 'Mental Health & Inner Peace')
+  // 5. Mental Health & Inner Peace
   if (chosen.includes('Mental Health & Inner Peace')) {
-    dynamicNodes.push('mental_health_diagnostic');
+    dynamicNodes.push('mental_q1', 'mental_q2', 'mental_q3');
   }
 
-  // 6. Relationships & Social Life (Conditional on choosing 'Relationships & Social Life')
+  // 6. Relationships & Social Life
   if (chosen.includes('Relationships & Social Life')) {
-    dynamicNodes.push('relationships_social_diagnostic');
+    dynamicNodes.push('relationships_q1', 'relationships_q2', 'relationships_q3');
   }
 
   const universalEndNodes = [
@@ -1716,92 +1853,135 @@ function calculateLifeMapMetrics() {
   const focus = state.sessionData.focus_areas || [];
   const stateVal = state.sessionData.life_state || [];
 
-  // BODY calculation (Base 30, Max 100)
-  let body = 30;
-  
-  // Gym Gate Branch Calculations
-  const gymGate = flow.fitness_gym_gate;
-  if (gymGate && gymGate.includes('Yes')) {
-    body += 25;
-  } else if (gymGate && gymGate.includes('home workouts')) {
-    body += 20;
-  } else if (gymGate && gymGate.includes('No')) {
-    body += 5;
+  // BODY calculation (Base 35, Max 100)
+  let body = 35;
+  const gymQ1 = flow.gym_q1 || '';
+  const gymQ2 = flow.gym_q2 || '';
+  const gymQ3 = flow.gym_q3 || [];
+
+  if (gymQ1.includes('commercial') || gymQ1.includes('home')) {
+    body += 15;
   }
+  if (gymQ2.includes('4-5 Days')) {
+    body += 15;
+  } else if (gymQ2.includes('3 Days')) {
+    body += 10;
+  } else if (gymQ2.includes('Gym') || gymQ2.includes('Workouts')) {
+    body += 5; // inactive starting path
+  }
+  body += (gymQ3.length * 5); // +5 per checked option
 
-  if (info.activity_level === 'Very Active') body += 25;
-  else if (info.activity_level === 'Moderately Active') body += 18;
-  else if (info.activity_level === 'Lightly Active') body += 10;
-
-  if (flow.eating_state === 'Clean — I mostly eat healthy, whole foods') body += 12;
-  else if (flow.eating_state === 'Average — A mix of home food and fast food') body += 6;
-
-  if (focus.includes('Gym & Fitness Training')) body += 10;
+  if (focus.includes('Gym & Fitness Training')) body += 15;
   body = Math.min(100, body);
-
-  // MIND calculation (Base 30, Max 100)
-  let mind = 30;
-  const confidence = parseInt(gen.routine_confidence) || 5;
-  mind += confidence * 2.5; // up to 25
-
-  if (flow.discipline_state === 'highly_disciplined') mind += 20;
-  else if (flow.discipline_state === 'mostly_consistent') mind += 14;
-  else if (flow.discipline_state === 'struggle_consistency') mind += 8;
-
-  if (gen.final_mindset === 'mnd_success' || gen.final_mindset === 'mnd_transform') mind += 15;
-  else if (gen.final_mindset === 'mnd_peace' || gen.final_mindset === 'mnd_meaning') mind += 10;
-
-  if (focus.includes('Focus, Discipline & Study')) mind += 10;
-  mind = Math.min(100, mind);
-
-  // REST calculation (Base 30, Max 100)
-  let rest = 30;
-  if (flow.sleep_state && flow.sleep_state.includes('Solid')) rest += 35;
-  else if (flow.sleep_state && flow.sleep_state.includes('Hit or miss')) rest += 20;
-  else if (flow.sleep_state && flow.sleep_state.includes('Pretty bad')) rest += 8;
-
-  const addictions = gen.addictions_distractions || [];
-  if (!addictions.includes('Late-night scrolling')) rest += 15;
-  if (!stateVal.includes('exhausted')) rest += 15;
-  if (focus.includes('Sleep & Circadian Rhythm')) rest += 10;
-  rest = Math.min(100, rest);
 
   // FUEL calculation (Base 35, Max 100)
   let fuel = 35;
-  if (flow.eating_state === 'Clean — I mostly eat healthy, whole foods') fuel += 35;
-  else if (flow.eating_state === 'Average — A mix of home food and fast food') fuel += 18;
-  else if (flow.eating_state === 'Unhealthy — A lot of junk food and irregular meals') fuel += 5;
+  const dietQ1 = flow.diet_q1 || '';
+  const dietQ2 = flow.diet_q2 || '';
+  const dietQ3 = flow.diet_q3 || [];
 
-  if (flow.eating_support === 'No, my nutrition is completely handled') fuel += 15;
-  else if (flow.eating_support === 'Yes, just help me track my calories and protein') fuel += 8;
+  if (dietQ1.includes('optimize')) {
+    fuel += 25;
+  } else if (dietQ1.includes('clean')) {
+    fuel += 15;
+  } else if (dietQ1.includes('convenient')) {
+    fuel += 5;
+  }
+  if (dietQ2) {
+    fuel += 10; // obstacle defined
+  }
+  fuel += (dietQ3.length * 10); // +10 per checked option
 
   if (focus.includes('Diet & Nutrition Balance')) fuel += 15;
   fuel = Math.min(100, fuel);
 
+  // REST calculation (Base 35, Max 100)
+  let rest = 35;
+  const sleepQ1 = flow.sleep_q1 || '';
+  const sleepQ2 = flow.sleep_q2 || '';
+  const sleepQ3 = flow.sleep_q3 || [];
+
+  if (sleepQ1.includes('fixed')) {
+    rest += 20;
+  } else if (sleepQ1.includes('chaotic')) {
+    rest += 8;
+  }
+  if (sleepQ2) {
+    rest += 10;
+  }
+  rest += (sleepQ3.length * 10);
+
+  const addictions = gen.addictions_distractions || [];
+  if (!addictions.includes('Late-night scrolling')) rest += 15;
+  if (focus.includes('Sleep & Circadian Rhythm')) rest += 15;
+  rest = Math.min(100, rest);
+
+  // MIND calculation (Base 35, Max 100)
+  let mind = 35;
+  const confidence = parseInt(gen.routine_confidence) || 5;
+  mind += confidence * 2; // up to 20
+
+  const studyQ1 = flow.study_q1 || '';
+  const studyQ2 = flow.study_q2 || '';
+  const studyQ3 = flow.study_q3 || [];
+
+  if (studyQ1.includes('5+')) {
+    mind += 15;
+  } else if (studyQ1.includes('2 to 5')) {
+    mind += 10;
+  } else if (studyQ1.includes('Less')) {
+    mind += 5;
+  }
+  if (studyQ2) {
+    mind += 5;
+  }
+  mind += (studyQ3.length * 5);
+
+  const mentalQ1 = flow.mental_q1 || '';
+  const mentalQ2 = flow.mental_q2 || '';
+  const mentalQ3 = flow.mental_q3 || [];
+
+  if (mentalQ1.includes('Occasionally')) {
+    mind += 10;
+  } else if (mentalQ1.includes('Constantly')) {
+    mind += 5;
+  }
+  if (mentalQ2) {
+    mind += 5;
+  }
+  mind += (mentalQ3.length * 5);
+
+  if (focus.includes('Focus, Discipline & Study') || focus.includes('Mental Health & Inner Peace')) {
+    mind += 15;
+  }
+  mind = Math.min(100, mind);
+
   // CONNECTION calculation (Base 35, Max 100)
   let connection = 35;
-  const relStat = (info.relationship_status || '').toLowerCase();
-  if (relStat === 'in_relationship' || relStat === 'in a relationship') connection += 20;
-  else if (relStat === 'focus_on_self' || relStat === 'focus on self') connection += 12;
-  else connection += 15;
+  const relQ1 = flow.relationships_q1 || '';
+  const relQ2 = flow.relationships_q2 || '';
+  const relQ3 = flow.relationships_q3 || [];
 
-  const relTargets = flow.relationships_target || [];
-  if (relTargets.length > 0) connection += 15;
+  if (relQ1.includes('Surrounded')) {
+    connection += 20;
+  } else if (relQ1.includes('Isolated')) {
+    connection += 10;
+  }
+  if (relQ2) {
+    connection += 10;
+  }
+  connection += (relQ3.length * 10);
 
-  if (flow.relationships_challenge === 'rel_none') connection += 20;
-  else if (flow.relationships_challenge === 'rel_no_time') connection += 12;
-  else if (flow.relationships_challenge === 'rel_communication') connection += 10;
-
-  if (focus.includes('Relationships & Social Life')) connection += 10;
+  if (focus.includes('Relationships & Social Life')) connection += 15;
   connection = Math.min(100, connection);
 
   // PURPOSE calculation (Base 35, Max 100)
   let purpose = 35;
-  if (stateVal.includes('improve_seriously') || stateVal.includes('level_up')) purpose += 20;
-  else if (stateVal.includes('okay_better')) purpose += 12;
+  if (stateVal.includes('improve_seriously') || stateVal.includes('level_up')) purpose += 25;
+  else if (stateVal.includes('okay_better')) purpose += 15;
 
-  if (gen.final_mindset === 'mnd_meaning' || gen.final_mindset === 'mnd_transform') purpose += 20;
-  else purpose += 12;
+  if (gen.final_mindset === 'mnd_meaning' || gen.final_mindset === 'mnd_transform') purpose += 25;
+  else purpose += 15;
   
   purpose = Math.min(100, purpose);
 
