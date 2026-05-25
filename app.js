@@ -840,18 +840,6 @@ const ALL_FLOW_NODES = {
     render: renderWhatsHoldingYouBack
   },
   
-  // NEW PAGE — WHAT MOST PEOPLE NEVER REALIZE
-  what_most_never_realize: {
-    type: 'custom',
-    render: renderWhatMostNeverRealize
-  },
-  
-  // NEW PAGE — TRANSFORMATION PREVIEW
-  transformation_preview: {
-    type: 'custom',
-    render: renderTransformationPreview
-  },
-  
   // 14. FINAL ROADMAP ONBOARDING COMPLETE (Universal)
   final_roadmap: {
     type: 'custom',
@@ -1061,8 +1049,6 @@ function buildDynamicQueue() {
     'ai_analysis_loading',
     'how_we_see_you',
     'whats_holding_you_back',
-    'what_most_never_realize',
-    'transformation_preview',
     'final_roadmap'
   ];
 
@@ -1868,9 +1854,9 @@ function renderAiAnalysisLoading(viewWrap) {
   let currentPercent = 0;
   let statusIndex = 0;
 
-  // Pulse animation loop
+  // Optimized pulse animation loop for sub-2-second resolution
   const interval = setInterval(() => {
-    currentPercent += Math.floor(Math.random() * 8) + 3;
+    currentPercent += Math.floor(Math.random() * 10) + 7;
     if (currentPercent >= 100) {
       currentPercent = 100;
       clearInterval(interval);
@@ -1878,7 +1864,7 @@ function renderAiAnalysisLoading(viewWrap) {
       status.innerText = "Growth profile synthesized.";
       setTimeout(() => {
         advanceStep();
-      }, 800);
+      }, 500);
     } else {
       pct.innerText = `${currentPercent}%`;
       // Smoothly transition loading texts based on percentage milestones
@@ -1889,10 +1875,10 @@ function renderAiAnalysisLoading(viewWrap) {
         setTimeout(() => {
           status.innerText = statusTexts[statusIndex];
           status.style.opacity = 1;
-        }, 200);
+        }, 150);
       }
     }
-  }, 150);
+  }, 110);
 }
 
 // SCREEN: "How We See You" Analysis Screen
@@ -2320,34 +2306,35 @@ function renderProfileLifeMap(viewWrap) {
   });
 }
 
-// SCREEN: "What's Holding You Back" Insights Page
+// SCREEN: "Friction & Strategy Analysis" Insights Page
 function renderWhatsHoldingYouBack(viewWrap) {
   const analysis = generateAIPersonalityAnalysis();
 
+  viewWrap.className = 'page-view';
   viewWrap.innerHTML = `
     <div class="question-header">
-      <span class="question-pre">Friction Audit</span>
-      <h2 class="question-title">What's Slowing Your Growth</h2>
-      <p class="question-desc">We have mapped the primary leaks draining your consistency. Conquering them starts with awareness.</p>
+      <span class="question-pre">Friction & Strategy Analysis</span>
+      <h2 class="question-title">Friction & Strategy Analysis</h2>
+      <p class="question-desc">We have identified your primary physical and cognitive bottlenecks and mapped direct counter-strategy protocols.</p>
     </div>
 
-    <div class="struggles-layout">
+    <h3 class="plan-helpers-header" style="text-align: left; margin: 20px 0 16px; font-size: 18px;">Your Identified Bottlenecks</h3>
+    <div class="plan-helpers-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 30px;">
       ${analysis.struggles.map(s => `
-        <div class="struggle-item">
-          <div class="struggle-icon-box">
+        <div class="struggle-item" style="flex-direction: column; gap: 12px; padding: 20px; text-align: center; border-left: none; border-bottom: 4px solid rgba(239, 68, 68, 0.4); margin-bottom: 0;">
+          <div class="struggle-icon-box" style="margin: 0 auto 4px;">
             <i data-lucide="${s.icon}"></i>
           </div>
           <div class="struggle-details">
-            <span class="struggle-title">${s.title}</span>
-            <p class="struggle-desc">${s.desc}</p>
+            <span class="struggle-title" style="font-size: 16px; text-align: center; display: block;">${s.title}</span>
+            <p class="struggle-desc" style="font-size: 13px; text-align: center; line-height: 1.4; margin-top: 4px;">${s.desc}</p>
           </div>
         </div>
       `).join('')}
     </div>
 
-    <h3 class="plan-helpers-header">How Your Plan Will Help</h3>
-
-    <div class="plan-helpers-grid">
+    <h3 class="plan-helpers-header" style="text-align: left; margin: 20px 0 16px; font-size: 18px;">How Your Plan Will Help</h3>
+    <div class="plan-helpers-grid" style="margin-bottom: 30px;">
       <div class="plan-helper-card glow-card">
         <i data-lucide="anchor" class="plan-helper-icon"></i>
         <span class="plan-helper-title">Habit Anchoring</span>
@@ -2369,7 +2356,7 @@ function renderWhatsHoldingYouBack(viewWrap) {
 
     <div class="action-bar">
       <button id="btn-submit-struggles" class="btn-premium primary">
-        <span>Continue</span>
+        <span>Continue to Roadmap</span>
         <i data-lucide="arrow-right"></i>
       </button>
     </div>
@@ -2383,169 +2370,94 @@ function renderWhatsHoldingYouBack(viewWrap) {
   });
 }
 
-// SCREEN: "What Most People Never Realize" Psychological commitment page
-function renderWhatMostNeverRealize(viewWrap) {
-  viewWrap.innerHTML = `
-    <div class="question-header">
-      <span class="question-pre">Stoic Truth</span>
-      <h2 class="question-title">What Most People Never Realize</h2>
-      <p class="question-desc">Personal growth fails because we rely on the wrong systems.</p>
-    </div>
+// SCREEN: Algorithmic Roadmap Synthesis Screen
+function renderRoadmapScreen(viewWrap) {
+  // First, generate the algorithmically tailored self-improvement roadmap
+  const roadmap = compileAlgorithmRoadmap();
+  state.sessionData.generated_roadmap = roadmap;
 
-    <div class="realization-layout">
-      <!-- Left side: The Stagnation Loop -->
-      <div class="stagnation-timeline">
-        <span class="stagnation-title">The Stagnation Loop</span>
-        
-        <div class="stagnation-step">
-          <div class="stagnation-dot">1</div>
-          <div class="stagnation-details">
-            <span class="stagnation-step-title">Motivation Hype</span>
-            <p class="stagnation-step-desc">A burst of emotional drive sparks the desire to change everything overnight.</p>
-          </div>
-        </div>
+  // Persist session to database (IndexedDB)
+  saveSession(state.sessionData)
+    .then(() => {
+      updateDBInspectorBadge();
+    })
+    .catch(err => console.error("Database Save Failed:", err));
 
-        <div class="stagnation-step">
-          <div class="stagnation-dot">2</div>
-          <div class="stagnation-details">
-            <span class="stagnation-step-title">Sudden Friction</span>
-            <p class="stagnation-step-desc">Life gets busy, fatigue kicks in, and the initial excitement evaporates.</p>
-          </div>
-        </div>
-
-        <div class="stagnation-step">
-          <div class="stagnation-dot">3</div>
-          <div class="stagnation-details">
-            <span class="stagnation-step-title">Consistency Crash</span>
-            <p class="stagnation-step-desc">Missing a habit triggers a guilt spiral. The routine is completely abandoned.</p>
-          </div>
-        </div>
-
-        <div class="stagnation-step">
-          <div class="stagnation-dot">4</div>
-          <div class="stagnation-details">
-            <span class="stagnation-step-title">Stagnation Loop</span>
-            <p class="stagnation-step-desc">You return exactly to where you started, waiting for the next spark of motivation.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right side: Why you are already ahead -->
-      <div class="realization-details">
-        <span class="realization-header">Why you are already breaking the cycle.</span>
-        <p class="realization-text">
-          95% of people quit because they rely on emotional inspiration to do hard things. They build massive plans but build zero self-awareness. By choosing to deconstruct your day honestly, you have already bypassed the first gate:
-        </p>
-
-        <div class="advantage-item">
-          <i data-lucide="eye" class="advantage-icon"></i>
-          <div class="advantage-content">
-            <span class="advantage-title">Radical Self-Awareness</span>
-            <p class="stagnation-step-desc">You did not look for quick hacks. You audited your routine, sleep, and environment honestly.</p>
-          </div>
-        </div>
-
-        <div class="advantage-item">
-          <i data-lucide="sliders" class="advantage-icon"></i>
-          <div class="advantage-content">
-            <span class="advantage-title">Analytical Intent</span>
-            <p class="stagnation-step-desc">We know exactly what drains your cognitive battery. We can insulate you from leaks systematically.</p>
-          </div>
-        </div>
-
-        <div class="advantage-item">
-          <i data-lucide="lock" class="advantage-icon"></i>
-          <div class="advantage-content">
-            <span class="advantage-title">Habits Over Hype</span>
-            <p class="stagnation-step-desc">We are not building a motivation plan. We are assembling a resilient habits system.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="action-bar">
-      <button id="btn-submit-realize" class="btn-premium primary">
-        <span>Preview Your Transformation</span>
-        <i data-lucide="arrow-right"></i>
-      </button>
-    </div>
-  `;
-
-  lucide.createIcons();
-
-  viewWrap.querySelector('#btn-submit-realize').addEventListener('click', () => {
-    advanceStep();
-  });
-}
-
-// SCREEN: "Your Transformation Preview" interactive milestone node
-function renderTransformationPreview(viewWrap) {
-  const chosen = state.sessionData.focus_areas || [];
-  
-  // Custom milestones based on focus areas
   const milestoneDetails = [
     {
       days: "Days 1-7",
-      title: "Base Synchronization",
-      desc: "We will establish circular sleep synchronization and frictionless morning triggers. Your only task is starting—building initial momentum with zero routine resistance.",
+      title: roadmap.stage_1,
+      desc: "Establishing physical baselines, low-friction circadian habits, and clean initial routine triggers designed to build immediate momentum with zero routine resistance.",
       icon: "activity"
     },
     {
       days: "Days 8-21",
-      title: "Focus Insulation",
-      desc: "We will systematically isolate you from digital dopamine loops and phone distraction triggers during high-impact blocks. We block cognitive friction before it drains you.",
+      title: roadmap.stage_2,
+      desc: "Isolating concentration windows, blocking dopamine spikes, and shielding cognitive reserves from leaks, insulating your attention during high-impact blocks.",
       icon: "shield"
     },
     {
       days: "Days 22-45",
-      title: "Willpower Autopilot",
-      desc: "Habit systems compound. Action triggers shift from conscious willpower effort to automatic, neurological reflexes. The daily routine operates smoothly on auto-pilot.",
+      title: roadmap.stage_3,
+      desc: "Assembling automatic Stoic daily systems and habit reflexes that operate independently of mood, shifting action triggers from conscious effort to neural reflexes.",
       icon: "zap"
     },
     {
       days: "Days 46+",
-      title: "Peak Ascent Scaling",
-      desc: "We compound your consistency to scale major lifetime goals. Circadian resting and Stoic habit loops are fully established, giving you ultimate sovereignty and autonomy.",
+      title: roadmap.stage_4,
+      desc: "Unlocking peak scalability and compounding gains in professional, physical, and mindset domains, giving you ultimate sovereignty and lifetime autonomy.",
       icon: "target"
     }
   ];
 
+  // Render the final confirmation view directly (no fake AI calculations loader delay!)
+  viewWrap.className = 'page-view';
   viewWrap.innerHTML = `
-    <div class="question-header">
-      <span class="question-pre">Habit Evolution</span>
-      <h2 class="question-title">Your Transformation starts here</h2>
-      <p class="question-desc">Click each milestone phase below to preview the progression of your KAIROS ascent protocol.</p>
-    </div>
-
-    <div class="preview-timeline">
-      ${milestoneDetails.map((m, idx) => `
-        <div class="timeline-node ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
-          <div class="timeline-node-icon">
-            <i data-lucide="${m.icon}"></i>
-          </div>
-          <span class="timeline-node-days">${m.days}</span>
-          <span class="timeline-node-title">${m.title}</span>
-        </div>
-      `).join('')}
-    </div>
-
-    <!-- Active Details Display Box -->
-    <div class="preview-detail-card" id="detail-card">
-      <div class="preview-detail-icon-box" id="detail-icon-box">
-        <i data-lucide="${milestoneDetails[0].icon}"></i>
-      </div>
-      <div class="preview-detail-content">
-        <span class="preview-detail-header" id="detail-header">${milestoneDetails[0].days}</span>
-        <span class="preview-detail-title" id="detail-title">${milestoneDetails[0].title}</span>
-        <p class="preview-detail-desc" id="detail-desc">${milestoneDetails[0].desc}</p>
-      </div>
-    </div>
-
-    <div class="action-bar">
-      <button id="btn-submit-preview" class="btn-premium primary">
-        <span>Generate Ascent Roadmap</span>
+    <div class="roadmap-container">
+      <div class="pulse-sparkle-box">
         <i data-lucide="sparkles"></i>
-      </button>
+      </div>
+      
+      <span class="roadmap-badge">Onboarding Complete</span>
+      <h2 class="welcome-title" style="font-size: 38px; letter-spacing:-1px;">Your Ascent Roadmap</h2>
+      <p class="welcome-subtitle" style="font-size: 15px; margin-bottom: 24px;">Welcome, ${state.sessionData.basic_info.first_name || 'my friend'}. Here is your customized timeline progression for the <strong>${roadmap.archetype}</strong> protocol.</p>
+      
+      <div class="roadmap-card" style="margin-top: 0; padding-top: 24px; padding-bottom: 24px;">
+        <div class="roadmap-archetype" style="margin-bottom: 12px; font-size: 18px;">Archetype: ${roadmap.archetype}</div>
+        <p class="roadmap-desc" style="margin-bottom: 24px; padding-bottom: 16px; font-size: 14px;">${roadmap.letter}</p>
+
+        <!-- 4-Phase Horizontal Timeline View in the center -->
+        <div class="preview-timeline" style="margin-bottom: 24px;">
+          ${milestoneDetails.map((m, idx) => `
+            <div class="timeline-node ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
+              <div class="timeline-node-icon">
+                <i data-lucide="${m.icon}"></i>
+              </div>
+              <span class="timeline-node-days">${m.days}</span>
+              <span class="timeline-node-title" style="font-size: 12px; line-height: 1.3;">${m.title.split(' & ')[0].split(' - ')[0]}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Active Details Display Box -->
+        <div class="preview-detail-card" id="detail-card" style="margin-bottom: 0; min-height: 120px; padding: 20px;">
+          <div class="preview-detail-icon-box" id="detail-icon-box">
+            <i data-lucide="${milestoneDetails[0].icon}"></i>
+          </div>
+          <div class="preview-detail-content">
+            <span class="preview-detail-header" id="detail-header">${milestoneDetails[0].days}</span>
+            <span class="preview-detail-title" id="detail-title" style="font-size: 16px;">${milestoneDetails[0].title}</span>
+            <p class="preview-detail-desc" id="detail-desc" style="font-size: 13px; margin: 0; line-height: 1.5; color: var(--text-secondary);">${milestoneDetails[0].desc}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="action-bar" style="margin-top: 30px;">
+        <button id="btn-enter-life" class="btn-premium primary" style="min-width: 280px;">
+          <span>Enter Your New Life →</span>
+          <i data-lucide="shield-check"></i>
+        </button>
+      </div>
     </div>
   `;
 
@@ -2579,137 +2491,13 @@ function renderTransformationPreview(viewWrap) {
         
         dCard.style.opacity = 1;
         dCard.style.transform = 'translateY(0)';
-      }, 200);
+      }, 150);
     });
   });
 
-  viewWrap.querySelector('#btn-submit-preview').addEventListener('click', () => {
-    advanceStep();
+  viewWrap.querySelector('#btn-enter-life').addEventListener('click', () => {
+    renderUserDashboard(viewWrap);
   });
-}
-
-// SCREEN 14: Algorithmic Roadmap Synthesis Screen
-function renderRoadmapScreen(viewWrap) {
-  // First, generate the algorithmically tailored self-improvement roadmap
-  const roadmap = compileAlgorithmRoadmap();
-  state.sessionData.generated_roadmap = roadmap;
-  
-  // Show breathing loading sequence first to simulate high-end "AI Processing" calculations
-  viewWrap.className = 'page-view roadmap-loading-container';
-  viewWrap.innerHTML = `
-    <div class="roadmap-loading">
-      <div class="spinner-ring"></div>
-      <span class="loading-text" id="loading-txt">Synthesizing personal life blueprint...</span>
-    </div>
-  `;
-  
-  // Stepwise breathing text animations
-  const stepsTexts = [
-    "Synthesizing personal life blueprint...",
-    "Aligning micro-habits to focus vectors...",
-    "Injecting Stoic optimization logic...",
-    "Calibrating circadian sleep triggers...",
-    "Roadmap complete. Aligning entry pathways..."
-  ];
-  
-  let txtIdx = 0;
-  const txtInterval = setInterval(() => {
-    const el = viewWrap.querySelector('#loading-txt');
-    if (!el) {
-      clearInterval(txtInterval);
-      return;
-    }
-    txtIdx = Math.min(stepsTexts.length - 1, txtIdx + 1);
-    el.innerText = stepsTexts[txtIdx];
-  }, 1000);
-  
-  // Persist session to database (IndexedDB)
-  saveSession(state.sessionData)
-    .then(() => {
-      updateDBInspectorBadge();
-    })
-    .catch(err => console.error("Database Save Failed:", err));
-  
-  setTimeout(() => {
-    clearInterval(txtInterval);
-    
-    // Smooth fade into final custom visual roadmap card
-    viewWrap.innerHTML = `
-      <div class="roadmap-container">
-        <div class="pulse-sparkle-box">
-          <i data-lucide="sparkles"></i>
-        </div>
-        
-        <span class="roadmap-badge">Onboarding Complete</span>
-        <h2 class="welcome-title" style="font-size: 38px; letter-spacing:-1px;">Your Journey Starts Now</h2>
-        <p class="welcome-subtitle" style="font-size: 15px; margin-bottom: 0;">Welcome, ${state.sessionData.basic_info.first_name}. We have customized a dynamic ascent model for your life.</p>
-        
-        <div class="roadmap-card">
-          <div class="roadmap-archetype">Archetype: ${roadmap.archetype}</div>
-          <h3 class="roadmap-title">${roadmap.stage_1.split(':')[0]}</h3>
-          <p class="roadmap-desc">${roadmap.letter}</p>
-          
-          <div class="roadmap-steps-list">
-            <div class="roadmap-step-item">
-              <div class="step-num-node">I</div>
-              <div class="step-details">
-                <span class="step-title">${roadmap.stage_1}</span>
-                <p class="step-summary">Focuses on resetting physical and cognitive baselines immediately.</p>
-              </div>
-            </div>
-            
-            <div class="roadmap-step-item">
-              <div class="step-num-node">II</div>
-              <div class="step-details">
-                <span class="step-title">${roadmap.stage_2}</span>
-                <p class="step-summary">Establishes anchors to isolate concentration blocks and block friction leaks.</p>
-              </div>
-            </div>
-            
-            <div class="roadmap-step-item">
-              <div class="step-num-node">III</div>
-              <div class="step-details">
-                <span class="step-title">${roadmap.stage_3}</span>
-                <p class="step-summary">Compounds consistency loops to form automatic, resilient reflexes.</p>
-              </div>
-            </div>
-            
-            <div class="roadmap-step-item">
-              <div class="step-num-node">IV</div>
-              <div class="step-details">
-                <span class="step-title">${roadmap.stage_4}</span>
-                <p class="step-summary">Unlocks peak leverage scaling in career, financials, or elite physical domains.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="action-bar">
-          <button id="btn-enter-life" class="btn-premium primary" style="min-width: 250px;">
-            <span>Enter Your New Life</span>
-            <i data-lucide="shield-check"></i>
-          </button>
-        </div>
-      </div>
-      
-      <!-- Fullscreen white transition element -->
-      <div id="flash-overlay" class="fullscreen-enter-flash"></div>
-    `;
-    
-    lucide.createIcons();
-    
-    viewWrap.querySelector('#btn-enter-life').addEventListener('click', () => {
-      const flash = viewWrap.querySelector('#flash-overlay');
-      if (flash) {
-        flash.classList.add('active');
-        
-        setTimeout(() => {
-          renderUserDashboard(viewWrap);
-        }, 1500);
-      }
-    });
-    
-  }, 4200); // Process loading duration
 }
 
 function compileAlgorithmRoadmap() {
