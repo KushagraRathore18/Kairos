@@ -1847,143 +1847,90 @@ function renderHowWeSeeYou(viewWrap) {
 
 // --- DYNAMIC SCORES CALCULATION FOR LIFE MAP ---
 function calculateLifeMapMetrics() {
-  const info = state.sessionData.basic_info || {};
   const flow = state.sessionData.flow_responses || {};
-  const gen = state.sessionData.general_responses || {};
   const focus = state.sessionData.focus_areas || [];
-  const stateVal = state.sessionData.life_state || [];
 
-  // BODY calculation (Base 35, Max 100)
-  let body = 35;
-  const gymQ1 = flow.gym_q1 || '';
-  const gymQ2 = flow.gym_q2 || '';
-  const gymQ3 = flow.gym_q3 || [];
-
-  if (gymQ1.includes('commercial') || gymQ1.includes('home')) {
-    body += 15;
+  // 1. BODY (Gym & Fitness Training)
+  let body = 85;
+  if (focus.includes('Gym & Fitness Training')) {
+    body = 100;
+    const gymQ1 = flow.gym_q1 || '';
+    if (gymQ1 === 'I am currently completely inactive.') {
+      body -= 40;
+    } else if (gymQ1 === 'I do home workouts / bodyweight routines.') {
+      body -= 15;
+    }
   }
-  if (gymQ2.includes('4-5 Days')) {
-    body += 15;
-  } else if (gymQ2.includes('3 Days')) {
-    body += 10;
-  } else if (gymQ2.includes('Gym') || gymQ2.includes('Workouts')) {
-    body += 5; // inactive starting path
+  body = Math.min(100, Math.max(15, body));
+
+  // 2. FUEL (Diet & Nutrition Balance)
+  let fuel = 85;
+  if (focus.includes('Diet & Nutrition Balance')) {
+    fuel = 100;
+    const dietQ1 = flow.diet_q1 || '';
+    const dietQ2 = flow.diet_q2 || '';
+    if (dietQ1 === 'I eat whatever is convenient (takeout/fast food).') {
+      fuel -= 35;
+    }
+    if (dietQ2 === 'The tedious friction of counting calories/macros.') {
+      fuel -= 15;
+    }
   }
-  body += (gymQ3.length * 5); // +5 per checked option
+  fuel = Math.min(100, Math.max(15, fuel));
 
-  if (focus.includes('Gym & Fitness Training')) body += 15;
-  body = Math.min(100, body);
-
-  // FUEL calculation (Base 35, Max 100)
-  let fuel = 35;
-  const dietQ1 = flow.diet_q1 || '';
-  const dietQ2 = flow.diet_q2 || '';
-  const dietQ3 = flow.diet_q3 || [];
-
-  if (dietQ1.includes('optimize')) {
-    fuel += 25;
-  } else if (dietQ1.includes('clean')) {
-    fuel += 15;
-  } else if (dietQ1.includes('convenient')) {
-    fuel += 5;
+  // 3. REST (Sleep & Circadian Rhythm)
+  let rest = 85;
+  if (focus.includes('Sleep & Circadian Rhythm')) {
+    rest = 100;
+    const sleepQ1 = flow.sleep_q1 || '';
+    const sleepQ2 = flow.sleep_q2 || '';
+    if (sleepQ1 === 'Completely chaotic — sleep times change daily.') {
+      rest -= 40;
+    }
+    if (sleepQ2 === 'Revenge bedtime procrastination (phone scrolling).') {
+      rest -= 15;
+    }
   }
-  if (dietQ2) {
-    fuel += 10; // obstacle defined
+  rest = Math.min(100, Math.max(15, rest));
+
+  // 4. MIND (Focus, Discipline & Study)
+  let mind = 85;
+  if (focus.includes('Focus, Discipline & Study')) {
+    mind = 100;
+    const studyQ1 = flow.study_q1 || '';
+    if (studyQ1 === 'Less than 2 hours — I struggle to lock in.') {
+      mind -= 35;
+    } else if (studyQ1 === '2 to 5 hours — I work with interruptions.') {
+      mind -= 15;
+    }
   }
-  fuel += (dietQ3.length * 10); // +10 per checked option
+  mind = Math.min(100, Math.max(15, mind));
 
-  if (focus.includes('Diet & Nutrition Balance')) fuel += 15;
-  fuel = Math.min(100, fuel);
-
-  // REST calculation (Base 35, Max 100)
-  let rest = 35;
-  const sleepQ1 = flow.sleep_q1 || '';
-  const sleepQ2 = flow.sleep_q2 || '';
-  const sleepQ3 = flow.sleep_q3 || [];
-
-  if (sleepQ1.includes('fixed')) {
-    rest += 20;
-  } else if (sleepQ1.includes('chaotic')) {
-    rest += 8;
+  // 5. PURPOSE (Mental Health & Inner Peace)
+  let purpose = 85;
+  if (focus.includes('Mental Health & Inner Peace')) {
+    purpose = 100;
+    const mentalQ1 = flow.mental_q1 || '';
+    if (mentalQ1 === 'Constantly — overthinking stops me from acting.') {
+      purpose -= 40;
+    } else if (mentalQ1 === 'Occasionally — I execute but feel mentally drained.') {
+      purpose -= 20;
+    }
   }
-  if (sleepQ2) {
-    rest += 10;
+  purpose = Math.min(100, Math.max(15, purpose));
+
+  // 6. CONNECTION (Relationships & Social Life)
+  let connection = 85;
+  if (focus.includes('Relationships & Social Life')) {
+    connection = 100;
+    const relQ1 = flow.relationships_q1 || '';
+    if (relQ1 === 'Isolated — focusing on goals made me neglect people.') {
+      connection -= 45;
+    } else if (relQ1 === 'Surrounded by people, but lacking deep bonds.') {
+      connection -= 20;
+    }
   }
-  rest += (sleepQ3.length * 10);
-
-  const addictions = gen.addictions_distractions || [];
-  if (!addictions.includes('Late-night scrolling')) rest += 15;
-  if (focus.includes('Sleep & Circadian Rhythm')) rest += 15;
-  rest = Math.min(100, rest);
-
-  // MIND calculation (Base 35, Max 100)
-  let mind = 35;
-  const confidence = parseInt(gen.routine_confidence) || 5;
-  mind += confidence * 2; // up to 20
-
-  const studyQ1 = flow.study_q1 || '';
-  const studyQ2 = flow.study_q2 || '';
-  const studyQ3 = flow.study_q3 || [];
-
-  if (studyQ1.includes('5+')) {
-    mind += 15;
-  } else if (studyQ1.includes('2 to 5')) {
-    mind += 10;
-  } else if (studyQ1.includes('Less')) {
-    mind += 5;
-  }
-  if (studyQ2) {
-    mind += 5;
-  }
-  mind += (studyQ3.length * 5);
-
-  const mentalQ1 = flow.mental_q1 || '';
-  const mentalQ2 = flow.mental_q2 || '';
-  const mentalQ3 = flow.mental_q3 || [];
-
-  if (mentalQ1.includes('Occasionally')) {
-    mind += 10;
-  } else if (mentalQ1.includes('Constantly')) {
-    mind += 5;
-  }
-  if (mentalQ2) {
-    mind += 5;
-  }
-  mind += (mentalQ3.length * 5);
-
-  if (focus.includes('Focus, Discipline & Study') || focus.includes('Mental Health & Inner Peace')) {
-    mind += 15;
-  }
-  mind = Math.min(100, mind);
-
-  // CONNECTION calculation (Base 35, Max 100)
-  let connection = 35;
-  const relQ1 = flow.relationships_q1 || '';
-  const relQ2 = flow.relationships_q2 || '';
-  const relQ3 = flow.relationships_q3 || [];
-
-  if (relQ1.includes('Surrounded')) {
-    connection += 20;
-  } else if (relQ1.includes('Isolated')) {
-    connection += 10;
-  }
-  if (relQ2) {
-    connection += 10;
-  }
-  connection += (relQ3.length * 10);
-
-  if (focus.includes('Relationships & Social Life')) connection += 15;
-  connection = Math.min(100, connection);
-
-  // PURPOSE calculation (Base 35, Max 100)
-  let purpose = 35;
-  if (stateVal.includes('improve_seriously') || stateVal.includes('level_up')) purpose += 25;
-  else if (stateVal.includes('okay_better')) purpose += 15;
-
-  if (gen.final_mindset === 'mnd_meaning' || gen.final_mindset === 'mnd_transform') purpose += 25;
-  else purpose += 15;
-  
-  purpose = Math.min(100, purpose);
+  connection = Math.min(100, Math.max(15, connection));
 
   return { body, mind, rest, fuel, connection, purpose };
 }
