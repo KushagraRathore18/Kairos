@@ -228,7 +228,8 @@ const ALL_FLOW_NODES = {
     subtitle: 'This calibrates the exact physical space of your training routines.',
     options: [
       { id: 'fit_gym_yes', text: 'Yes', desc: 'I have access to a commercial gym or dedicated training facility.', icon: 'check-circle' },
-      { id: 'fit_gym_no', text: 'No', desc: 'I train at home, outdoors, or am currently inactive.', icon: 'x-circle' }
+      { id: 'fit_gym_no', text: 'No', desc: 'I am currently inactive or not engaged in structured workouts.', icon: 'x-circle' },
+      { id: 'fit_gym_home', text: 'I do home workouts / other workouts', desc: 'I train at home, outdoors, or follow functional/calisthenics routes.', icon: 'home' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.fitness_gym_gate = val;
@@ -856,15 +857,17 @@ function buildDynamicQueue() {
   // Build dynamic nodes array based on focus selections
   const dynamicNodes = [];
   
+  // Gym Gate is now UNIVERSAL (Loads immediately after Focus Selection)
+  dynamicNodes.push('fitness_gym_gate');
+  const gymGate = state.sessionData.flow_responses.fitness_gym_gate;
+  if (gymGate === 'Yes') {
+    dynamicNodes.push('fitness_gym_frequency');
+  } else if (gymGate === 'No') {
+    dynamicNodes.push('fitness_gym_no_psych');
+  }
+  
   // 1. Physical Health & Fitness Flow
   if (chosen.includes('Physical Health & Fitness')) {
-    dynamicNodes.push('fitness_gym_gate');
-    const gymGate = state.sessionData.flow_responses.fitness_gym_gate;
-    if (gymGate === 'Yes') {
-      dynamicNodes.push('fitness_gym_frequency');
-    } else if (gymGate === 'No') {
-      dynamicNodes.push('fitness_gym_no_psych');
-    }
     dynamicNodes.push('fitness_activity', 'fitness_lifestyle', 'fitness_goal', 'fitness_obstacle');
   }
   
@@ -1797,6 +1800,8 @@ function calculateLifeMapMetrics() {
     if (psych === 'Yes') body += 10;
     else if (psych === "Don't want to, but can if that improves my life") body += 14;
     else if (psych === 'No') body += 4;
+  } else if (gymGate === 'I do home workouts / other workouts') {
+    body += 15;
   }
 
   if (flow.fitness_lifestyle === 'fit_gym_consistent') body += 18;
