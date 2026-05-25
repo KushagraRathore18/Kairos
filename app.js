@@ -216,9 +216,7 @@ const ALL_FLOW_NODES = {
       state.sessionData.basic_info.relationship_status = val;
       state.sessionData.flow_responses.relationship_status = val;
     }
-  },
-  
-  // 1. GYM & FITNESS TRAINING (Strictly Conditional)
+    // 1. GYM & FITNESS TRAINING (Strictly Conditional)
   gym_q1: {
     type: 'single',
     title: "What does your current workout environment look like?",
@@ -226,6 +224,7 @@ const ALL_FLOW_NODES = {
     options: [
       { id: 'gym_q1_comm', text: "I go to a commercial gym facility.", desc: "Access to machines, free weights, and dedicated lifting spaces.", icon: 'building' },
       { id: 'gym_q1_home', text: "I do home workouts / bodyweight routines.", desc: "Training in your own space with minimal or bodyweight equipment.", icon: 'home' },
+      { id: 'gym_q1_outdoors', text: "I train outdoors / do sports or calisthenics.", desc: "Using parks, track facilities, or bodyweight bars.", icon: 'compass' },
       { id: 'gym_q1_inactive', text: "I am currently completely inactive.", desc: "Looking to build standard movement habits from scratch.", icon: 'coffee' }
     ],
     save: (val) => {
@@ -235,29 +234,13 @@ const ALL_FLOW_NODES = {
   
   gym_q2: {
     type: 'single',
-    get title() {
-      const q1 = state.sessionData.flow_responses.gym_q1 || '';
-      if (q1.includes('inactive')) {
-        return "Would you like to train at a gym or at home?";
-      } else {
-        return "How many days a week do you want to train?";
-      }
-    },
+    title: "What's your weekly consistency target?",
     subtitle: "",
-    get options() {
-      const q1 = state.sessionData.flow_responses.gym_q1 || '';
-      if (q1.includes('inactive')) {
-        return [
-          { id: 'gym_q2_inactive_comm', text: "Commercial Gym", desc: "Access to machines, free weights, and dedicated lifting spaces.", icon: 'dumbbell' },
-          { id: 'gym_q2_inactive_home', text: "Home Workouts", desc: "Training in your own space with minimal or bodyweight equipment.", icon: 'home' }
-        ];
-      } else {
-        return [
-          { id: 'gym_q2_active_3d', text: "3 Days", desc: "A sustainable three-day weekly routine ideal for solid progress.", icon: 'calendar' },
-          { id: 'gym_q2_active_45d', text: "4-5 Days", desc: "A higher frequency training plan for advanced performance.", icon: 'zap' }
-        ];
-      }
-    },
+    options: [
+      { id: 'gym_q2_moving', text: "Just trying to get moving (1-2 days a week).", desc: "Establishing a low-friction entry point for physical baseline.", icon: 'activity' },
+      { id: 'gym_q2_steady', text: "A steady, sustainable routine (3 days a week).", desc: "Solid, balanced split to build muscle and fitness.", icon: 'calendar' },
+      { id: 'gym_q2_serious', text: "Serious performance training (4-5 days a week).", desc: "High-frequency athlete program for advanced physical transformation.", icon: 'zap' }
+    ],
     save: (val) => {
       state.sessionData.flow_responses.gym_q2 = val;
     }
@@ -272,7 +255,8 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'gym_q3_sched', text: "I need an absolute weapon of a workout schedule built for my calendar.", desc: "Structured splits designed around your weekly availability.", icon: 'calendar' },
-      { id: 'gym_q3_mech', text: "I want to fix my exercise mechanics, form, and lifting execution.", desc: "Detailed form instruction and alignment blueprints.", icon: 'activity' }
+      { id: 'gym_q3_mech', text: "I want to fix my exercise mechanics, form, and lifting execution.", desc: "Detailed form instruction and alignment blueprints.", icon: 'activity' },
+      { id: 'gym_q3_account', text: "I need an accountability system to stop skipping sessions.", desc: "Consistency reminders and progress check-in metrics.", icon: 'shield' }
     ],
     save: (vals) => {
       state.sessionData.flow_responses.gym_q3 = vals;
@@ -294,8 +278,9 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'diet_q1_convenient', text: "I eat whatever is convenient (takeout/fast food).", desc: "High reliance on external meals, takeout, or processed options.", icon: 'coffee' },
-      { id: 'diet_q1_no_struct', text: "I try to eat clean but have no structure.", desc: "Healthy intentions but inconsistent meal times or selections.", icon: 'compass' },
-      { id: 'diet_q1_optimize', text: "I track meals but want to optimize.", desc: "Already tracking nutrition but looking to maximize biological leverage.", icon: 'trending-up' }
+      { id: 'diet_q1_no_struct', text: "I try to eat clean but have absolutely no structure.", desc: "Healthy intentions but inconsistent meal times or selections.", icon: 'compass' },
+      { id: 'diet_q1_skip_meals', text: "I skip meals often and have low daily energy.", desc: "Irregular fuel supply causing metabolic drops and brain fog.", icon: 'battery-low' },
+      { id: 'diet_q1_optimize', text: "I track meals but want to optimize macros.", desc: "Already tracking nutrition but looking to maximize biological leverage.", icon: 'trending-up' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.diet_q1 = val;
@@ -307,8 +292,9 @@ const ALL_FLOW_NODES = {
     title: "What is the biggest obstacle stopping you from eating clean?",
     subtitle: "",
     options: [
-      { id: 'diet_q2_time', text: "Lack of time for meal prep and cooking.", desc: "PREP RESISTANCE. Busy schedules conflict with standard home cooking.", icon: 'clock' },
-      { id: 'diet_q2_friction', text: "The tedious friction of counting calories/macros.", desc: "LOGGING FRICTION. You start counting but give up because tracking is tedious.", icon: 'alert-triangle' }
+      { id: 'diet_q2_time', text: "Lack of time for meal prep, grocery shopping, and cooking.", desc: "PREP RESISTANCE. Busy schedules conflict with standard home cooking.", icon: 'clock' },
+      { id: 'diet_q2_friction', text: "The tedious friction of counting calories/macros.", desc: "LOGGING FRICTION. You start counting but give up because tracking is tedious.", icon: 'alert-triangle' },
+      { id: 'diet_q2_social', text: "Social eating, cravings, and weekend cheat cycles.", desc: "Peer group eating pressures and late-night cravings.", icon: 'users' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.diet_q2 = val;
@@ -321,15 +307,18 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'diet_q3_quick_log', text: "Give me a fast, frictionless tool to log food without counting stress.", desc: "AI single-sentence log, avoiding tedious manual typing.", icon: 'zap' },
-      { id: 'diet_q3_blueprint', text: "Lock in a rock-solid, easy macro blueprint customized for my body.", desc: "Easy macro blueprints custom-built for your body type.", icon: 'shield' }
+      { id: 'diet_q3_blueprint', text: "Lock in a rock-solid, easy macro blueprint customized for my body.", desc: "Easy macro blueprints custom-built for your body type.", icon: 'shield' },
+      { id: 'diet_q3_prep', text: "Provide a streamlined 15-minute high-protein meal prep strategy.", desc: "Fast macro-meal builders for high-performance scheduling.", icon: 'flame' }
     ],
     save: (vals) => {
       state.sessionData.flow_responses.diet_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
       if (vals.includes("Give me a fast, frictionless tool to log food without counting stress.")) {
         state.sessionData.dashboard_offers.nutrition = 'AI Single-Sentence Quick-Log Widget';
-      } else {
+      } else if (vals.includes("Lock in a rock-solid, easy macro blueprint customized for my body.")) {
         state.sessionData.dashboard_offers.nutrition = '15-Minute Macro-Meal Builder Blueprint';
+      } else {
+        state.sessionData.dashboard_offers.nutrition = 'Weekly Caloric Buffer & Reset Engine';
       }
     }
   },
@@ -341,7 +330,8 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'sleep_q1_chaotic', text: "Completely chaotic — sleep times change daily.", desc: "Fluctuating sleep-wake boundaries causing heavy fatigue cycles.", icon: 'shuffle' },
-      { id: 'sleep_q1_fixed_tired', text: "Somewhat fixed, but I feel tired all day.", desc: "Fixed schedule but poor quality, leaving you depleted.", icon: 'battery-low' }
+      { id: 'sleep_q1_fixed_tired', text: "Somewhat fixed, but I feel tired all day.", desc: "Fixed schedule but poor quality, leaving you depleted.", icon: 'battery-low' },
+      { id: 'sleep_q1_waking', text: "I sleep enough hours but wake up multiple times at night.", desc: "Fragmented sleep blocks preventing deep REM cycle recovery.", icon: 'moon' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.sleep_q1 = val;
@@ -354,7 +344,8 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'sleep_q2_scrolling', text: "Revenge bedtime procrastination (phone scrolling).", desc: "Late-night neural stimulation blocking melatonin release.", icon: 'smartphone' },
-      { id: 'sleep_q2_quality', text: "Waking up in the night / poor sleep quality.", desc: "Frequent sleep fragmentation, waking up in exhaustion.", icon: 'moon' }
+      { id: 'sleep_q2_late_study', text: "Late-night studying, working, or overthinking.", desc: "High cognitive stimulation and stress hormone spikes near bed hours.", icon: 'brain' },
+      { id: 'sleep_q2_caffeine', text: "Relying on caffeine too late in the afternoon.", desc: "Adenosine receptors blocked, lowering deep sleep duration.", icon: 'coffee' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.sleep_q2 = val;
@@ -367,15 +358,18 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'sleep_q3_reset', text: "Resetting my biological clock so I wake up energized without an alarm.", desc: "Waking up in optimal REM windows with somatic checklists.", icon: 'sun' },
-      { id: 'sleep_q3_winddown', text: "Building an unbreakable, screen-free wind-down routine at night.", desc: "Digital sunset screen-lock protocols and wind-down tools.", icon: 'lock' }
+      { id: 'sleep_q3_winddown', text: "Building an unbreakable, screen-free wind-down routine at night.", desc: "Digital sunset screen-lock protocols and wind-down tools.", icon: 'lock' },
+      { id: 'sleep_q3_env', text: "Optimizing my bedroom environment and deep sleep quality flags.", desc: "Blackout, temperature, and environment baseline calibrations.", icon: 'home' }
     ],
     save: (vals) => {
       state.sessionData.flow_responses.sleep_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
       if (vals.includes("Resetting my biological clock so I wake up energized without an alarm.")) {
         state.sessionData.dashboard_offers.sleep = 'Immediate Action Morning Light & Somatic Checklist';
-      } else {
+      } else if (vals.includes("Building an unbreakable, screen-free wind-down routine at night.")) {
         state.sessionData.dashboard_offers.sleep = 'Digital Sunset Screen-Lock Protocol';
+      } else {
+        state.sessionData.dashboard_offers.sleep = 'Optimized Circadian REM Window Calculator';
       }
     }
   },
@@ -387,8 +381,8 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'study_q1_less_2', text: "Less than 2 hours — I struggle to lock in.", desc: "Heavy friction starting study sessions, low daily focus volume.", icon: 'clock' },
-      { id: 'study_q1_2_5', text: "2 to 5 hours — I work with interruptions.", desc: "Decent duration but fragmented by regular context switches.", icon: 'smartphone' },
-      { id: 'study_q1_more_5', text: "5+ hours — I study heavily but feel inefficient.", desc: "High hours, but suffering from diminishing returns and fatigue.", icon: 'battery-low' }
+      { id: 'study_q1_2_5', text: "2 to 5 hours — I work with constant interruptions.", desc: "Decent duration but fragmented by regular context switches.", icon: 'smartphone' },
+      { id: 'study_q1_more_5', text: "5+ hours — I study heavily but feel highly inefficient.", desc: "High hours, but suffering from diminishing returns and fatigue.", icon: 'battery-low' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.study_q1 = val;
@@ -400,8 +394,9 @@ const ALL_FLOW_NODES = {
     title: "What completely destroys your focus during a session?",
     subtitle: "",
     options: [
-      { id: 'study_q2_friction', text: "Task activation friction (procrastinating on starting).", desc: "Avoiding complex tasks until the absolute final hour.", icon: 'alert-circle' },
-      { id: 'study_q2_switching', text: "Context switching (checking phone tabs/social media).", desc: "Checking notifications or other browser tabs every 10 minutes.", icon: 'smartphone' }
+      { id: 'study_q2_friction', text: "Task activation friction (procrastinating on starting tough topics).", desc: "Avoiding complex tasks until the absolute final hour.", icon: 'alert-circle' },
+      { id: 'study_q2_switching', text: "Context switching (checking phone tabs, notifications, or social media).", desc: "Checking notifications or other browser tabs every 10 minutes.", icon: 'smartphone' },
+      { id: 'study_q2_fatigue', text: "Mental fog and physical fatigue setting in after 30 minutes.", desc: "Rapid stamina drops depleting starting motivation.", icon: 'battery-low' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.study_q2 = val;
@@ -414,15 +409,18 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'study_q3_vault', text: "A high-focus digital vault to lock down my sessions and block out tabs.", desc: "Focus vaults and browser shield structures.", icon: 'lock' },
-      { id: 'study_q3_pacing', text: "A sustainable pacing system so I study hard without burning out.", desc: "Study-to-rest optimal ratio protocols.", icon: 'activity' }
+      { id: 'study_q3_pacing', text: "A sustainable pacing system so I study hard without burning out.", desc: "Study-to-rest optimal ratio protocols.", icon: 'activity' },
+      { id: 'study_q3_prior', text: "An automated task-prioritization framework to clear brain fog.", desc: "3-item priority matrix filters to clear study overload.", icon: 'copy' }
     ],
     save: (vals) => {
       state.sessionData.flow_responses.study_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
       if (vals.includes("A high-focus digital vault to lock down my sessions and block out tabs.")) {
         state.sessionData.dashboard_offers.focus = 'AI Time-Block Focus Vault';
-      } else {
+      } else if (vals.includes("A sustainable pacing system so I study hard without burning out.")) {
         state.sessionData.dashboard_offers.focus = 'Sustainable Study-to-Rest Pacing Protocol';
+      } else {
+        state.sessionData.dashboard_offers.focus = '5-Minute Mindset Activation Timer';
       }
     }
   },
@@ -434,7 +432,8 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'mental_q1_constant', text: "Constantly — overthinking stops me from acting.", desc: "Analysis paralysis keeping your actions locked in overthinking.", icon: 'brain' },
-      { id: 'mental_q1_occasional', text: "Occasionally — I execute but feel mentally drained.", desc: "Getting things done but carrying heavy cognitive stress daily.", icon: 'battery-low' }
+      { id: 'mental_q1_occasional', text: "Occasionally — I execute but feel mentally drained.", desc: "Getting things done but carrying heavy cognitive stress daily.", icon: 'battery-low' },
+      { id: 'mental_q1_turnoff', text: "Rarely, but I struggle to turn off my brain at the end of the day.", desc: "Worry cycles and neural noise humming during wind-down periods.", icon: 'shuffle' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.mental_q1 = val;
@@ -446,8 +445,9 @@ const ALL_FLOW_NODES = {
     title: "What triggers your mental fatigue the most?",
     subtitle: "",
     options: [
-      { id: 'mental_q2_changes', text: "Unexpected changes in my daily plans.", desc: "Frustration and anxiety spikes when external events disrupt schedules.", icon: 'alert-triangle' },
-      { id: 'mental_q2_chaotic', text: "A chaotic physical and digital environment.", desc: "Sensory clutter in your workspace or device draining your drive.", icon: 'shuffle' }
+      { id: 'mental_q2_changes', text: "Unexpected changes or friction in my daily plans.", desc: "Frustration and anxiety spikes when external events disrupt schedules.", icon: 'alert-triangle' },
+      { id: 'mental_q2_chaotic', text: "A chaotic, unorganized physical and digital space.", desc: "Sensory clutter in your workspace or device draining your drive.", icon: 'shuffle' },
+      { id: 'mental_q2_compare', text: "Comparing my progress to others and feeling behind.", desc: "Self-criticism and imposter loops slowing down task momentum.", icon: 'frown' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.mental_q2 = val;
@@ -460,15 +460,18 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'mental_q3_breathwork', text: "Give me quick, 5-minute breathwork protocols to drop my stress instantly.", desc: "Physiological sigh and nervous system down-regulation (NSDR).", icon: 'wind' },
-      { id: 'mental_q3_brain_dump', text: "Give me a rapid mental clarity tool to dump my thoughts and stay sharp.", desc: "Brain-dump clarity blueprint filters to extract priority actions.", icon: 'copy' }
+      { id: 'mental_q3_brain_dump', text: "Give me a rapid mental clarity tool to dump my thoughts and stay sharp.", desc: "Brain-dump clarity blueprint filters to extract priority actions.", icon: 'copy' },
+      { id: 'mental_q3_perspective', text: "Build a daily perspective framework to handle performance anxiety.", desc: "Daily Stoic resilience reflection grounding matrices.", icon: 'shield' }
     ],
     save: (vals) => {
       state.sessionData.flow_responses.mental_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
       if (vals.includes("Give me quick, 5-minute breathwork protocols to drop my stress instantly.")) {
         state.sessionData.dashboard_offers.mental = 'Nervous System Down-Regulation (NSDR) Recovery Hub';
-      } else {
+      } else if (vals.includes("Give me a rapid mental clarity tool to dump my thoughts and stay sharp.")) {
         state.sessionData.dashboard_offers.mental = 'Brain-Dump Clarity Blueprint (3-Item Action List)';
+      } else {
+        state.sessionData.dashboard_offers.mental = 'Daily Stoic Resilience Reflection Grounding Box';
       }
     }
   },
@@ -480,7 +483,8 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'rel_q1_isolated', text: "Isolated — focusing on goals made me neglect people.", desc: "Focusing heavily on goals isolated you from key personal connections.", icon: 'user' },
-      { id: 'rel_q1_no_deep', text: "Surrounded by people, but lacking deep bonds.", desc: "Lack of deep, meaningful, values-aligned partnerships or friends.", icon: 'users' }
+      { id: 'rel_q1_no_deep', text: "Surrounded by people, but lacking deep, value-aligned bonds.", desc: "Lack of deep, meaningful, values-aligned partnerships or friends.", icon: 'users' },
+      { id: 'rel_q1_mentors', text: "Happy with my circle, but I lack network presence/mentors.", desc: "Good friends, but seeking noble peers and professional guides.", icon: 'award' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.relationships_q1 = val;
@@ -492,8 +496,9 @@ const ALL_FLOW_NODES = {
     title: "What is your main struggle with maintaining relationships?",
     subtitle: "",
     options: [
-      { id: 'rel_q2_forget', text: "I simply forget to check in consistently.", desc: "Neglecting relationships due to intense work focus loops.", icon: 'clock' },
-      { id: 'rel_q2_drain', text: "Socializing completely drains my focus energy.", desc: "Struggling to balance focus blocks and boundary limits.", icon: 'battery-low' }
+      { id: 'rel_q2_forget', text: "I simply forget to check in consistently due to a tight schedule.", desc: "Neglecting relationships due to intense work focus loops.", icon: 'clock' },
+      { id: 'rel_q2_drain', text: "Socializing completely drains my energy for studying/working.", desc: "Struggling to balance focus blocks and boundary limits.", icon: 'battery-low' },
+      { id: 'rel_q2_toxic', text: "Dealing with toxic environments or people who drain my drive.", desc: "Unsupportive surroundings depleting baseline motivation.", icon: 'alert-triangle' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.relationships_q2 = val;
@@ -506,15 +511,18 @@ const ALL_FLOW_NODES = {
     subtitle: "",
     options: [
       { id: 'rel_q3_reminders', text: "A smart reminder loop so I never neglect my closest family and friends.", desc: "Inner circle check-in scheduling reminders.", icon: 'calendar' },
-      { id: 'rel_q3_boundaries', text: "A strict boundary-setting tool to balance social time with my focus blocks.", desc: "Social capacity and boundary tracking blueprints.", icon: 'lock' }
+      { id: 'rel_q3_boundaries', text: "A strict boundary-setting tool to balance social time with my focus blocks.", desc: "Social capacity and boundary tracking blueprints.", icon: 'lock' },
+      { id: 'rel_q3_peers', text: "Access to value-aligned peer tracking to match my lifestyle goals.", desc: "Connection vectors to sync targets with high-performance peers.", icon: 'trending-up' }
     ],
     save: (vals) => {
       state.sessionData.flow_responses.relationships_q3 = vals;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
       if (vals.includes("A smart reminder loop so I never neglect my closest family and friends.")) {
         state.sessionData.dashboard_offers.social = 'Inner Circle Automation Reminders';
-      } else {
+      } else if (vals.includes("A strict boundary-setting tool to balance social time with my focus blocks.")) {
         state.sessionData.dashboard_offers.social = 'Boundary-Setting & Social Capacity Protocol';
+      } else {
+        state.sessionData.dashboard_offers.social = 'Social Networking & Value Alignment Tracker';
       }
     }
   },
@@ -1868,12 +1876,12 @@ function calculateLifeMapMetrics() {
   if (focus.includes('Diet & Nutrition Balance')) {
     fuel = 100;
     const dietQ1 = flow.diet_q1 || '';
-    const dietQ2 = flow.diet_q2 || '';
     if (dietQ1 === 'I eat whatever is convenient (takeout/fast food).') {
       fuel -= 35;
-    }
-    if (dietQ2 === 'The tedious friction of counting calories/macros.') {
+    } else if (dietQ1 === 'I try to eat clean but have absolutely no structure.') {
       fuel -= 15;
+    } else if (dietQ1 === 'I skip meals often and have low daily energy.') {
+      fuel -= 20;
     }
   }
   fuel = Math.min(100, Math.max(15, fuel));
@@ -1883,12 +1891,12 @@ function calculateLifeMapMetrics() {
   if (focus.includes('Sleep & Circadian Rhythm')) {
     rest = 100;
     const sleepQ1 = flow.sleep_q1 || '';
-    const sleepQ2 = flow.sleep_q2 || '';
     if (sleepQ1 === 'Completely chaotic — sleep times change daily.') {
       rest -= 40;
-    }
-    if (sleepQ2 === 'Revenge bedtime procrastination (phone scrolling).') {
+    } else if (sleepQ1 === 'Somewhat fixed, but I feel tired all day.') {
       rest -= 15;
+    } else if (sleepQ1 === 'I sleep enough hours but wake up multiple times at night.') {
+      rest -= 20;
     }
   }
   rest = Math.min(100, Math.max(15, rest));
@@ -1900,8 +1908,10 @@ function calculateLifeMapMetrics() {
     const studyQ1 = flow.study_q1 || '';
     if (studyQ1 === 'Less than 2 hours — I struggle to lock in.') {
       mind -= 35;
-    } else if (studyQ1 === '2 to 5 hours — I work with interruptions.') {
+    } else if (studyQ1 === '2 to 5 hours — I work with constant interruptions.') {
       mind -= 15;
+    } else if (studyQ1 === '5+ hours — I study heavily but feel highly inefficient.') {
+      mind -= 10;
     }
   }
   mind = Math.min(100, Math.max(15, mind));
@@ -1915,6 +1925,8 @@ function calculateLifeMapMetrics() {
       purpose -= 40;
     } else if (mentalQ1 === 'Occasionally — I execute but feel mentally drained.') {
       purpose -= 20;
+    } else if (mentalQ1 === 'Rarely, but I struggle to turn off my brain at the end of the day.') {
+      purpose -= 10;
     }
   }
   purpose = Math.min(100, Math.max(15, purpose));
@@ -1926,8 +1938,10 @@ function calculateLifeMapMetrics() {
     const relQ1 = flow.relationships_q1 || '';
     if (relQ1 === 'Isolated — focusing on goals made me neglect people.') {
       connection -= 45;
-    } else if (relQ1 === 'Surrounded by people, but lacking deep bonds.') {
+    } else if (relQ1 === 'Surrounded by people, but lacking deep, value-aligned bonds.') {
       connection -= 20;
+    } else if (relQ1 === 'Happy with my circle, but I lack network presence/mentors.') {
+      connection -= 10;
     }
   }
   connection = Math.min(100, Math.max(15, connection));
