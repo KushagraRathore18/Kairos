@@ -385,7 +385,7 @@ const ALL_FLOW_NODES = {
     save: (val) => { state.sessionData.flow_responses.education_state = val; }
   },
   education_distraction: {
-    type: 'single',
+    type: 'multiple',
     title: 'What distracts you the most?',
     subtitle: '',
     options: [
@@ -398,7 +398,7 @@ const ALL_FLOW_NODES = {
       { id: 'edu_dist_sleep', text: 'Poor sleep', desc: 'Waking up exhausted, destroying early morning focus blocks.', icon: 'moon' },
       { id: 'edu_dist_motivation', text: 'Low motivation', desc: 'Not caring enough about the task to allocate energy.', icon: 'battery' }
     ],
-    save: (val) => { state.sessionData.flow_responses.education_distraction = val; }
+    save: (vals) => { state.sessionData.flow_responses.education_distraction = vals; }
   },
   
   // 8. DISCIPLINE & MOTIVATION FLOW
@@ -862,8 +862,8 @@ function initializeState() {
   state.sessionData.id = 'session_' + Date.now();
   state.sessionData.timestamp = new Date().toISOString();
   
-  // Base initial queue
-  state.activeQueue = ['welcome', 'basic_info', 'life_state', 'focus_areas'];
+  // Base initial queue (life_state removed)
+  state.activeQueue = ['welcome', 'basic_info', 'focus_areas'];
   
   // Sync the navigation header state (hidden initially)
   const header = document.getElementById('app-header');
@@ -915,8 +915,9 @@ function buildDynamicQueue() {
   }
 
   // ── Focus & Productivity Flow ─────────────────────────────────────────────
+  // Merged: education_state is completely consolidated into education_distraction
   if (chosen.includes('Focus & Productivity') || chosen.includes('Education & Learning')) {
-    dynamicNodes.push('education_state', 'education_distraction');
+    dynamicNodes.push('education_distraction');
   }
 
   // ── Discipline & Consistency Flow ─────────────────────────────────────────
@@ -931,17 +932,16 @@ function buildDynamicQueue() {
   dynamicNodes.push('eating_state', 'eating_support');
 
   // ── Universal end pages ───────────────────────────────────────────────────
+  // reflection_pride and future_self_vision removed
   const universalEndNodes = [
     'routine',
     'reflection_progress',
-    'reflection_pride',
     'identity',
     'daily_environment',
     'routine_confidence',
     'addictions_distractions',
     'challenge_intensity',
     'personality_energy',
-    'future_self_vision',
     'final_mindset',
     'profile_life_map',
     'ai_analysis_loading',
@@ -955,7 +955,6 @@ function buildDynamicQueue() {
   state.activeQueue = [
     'welcome',
     'basic_info',
-    'life_state',
     'focus_areas',
     ...dynamicNodes,
     ...universalEndNodes
@@ -2631,7 +2630,7 @@ function renderRoadmapScreen(viewWrap) {
 
 function compileAlgorithmRoadmap() {
   const info = state.sessionData.basic_info;
-  const stateVal = state.sessionData.life_state;
+  const stateVal = state.sessionData.life_state || [];
   const chosenAreas = state.sessionData.focus_areas;
   const flowAns = state.sessionData.flow_responses;
   
