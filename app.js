@@ -665,7 +665,24 @@ const ALL_FLOW_NODES = {
       { id: 'id_transform', text: 'I want to transform myself completely', desc: 'Reinventing character, body, mind, and professional drive.', icon: 'sparkles' },
       { id: 'id_high_perf', text: 'I want a high-performance lifestyle', desc: 'Maximum leverage outputs, biological metrics, and grit.', icon: 'award' }
     ],
-    save: (val) => { state.sessionData.general_responses.identity = val; }
+    save: (val) => {
+      state.sessionData.general_responses.identity = val;
+      let arch = "THE BASELINE BUILDER";
+      if (val.includes("rebuild my life slowly") || val.includes("rebuild my life")) {
+        arch = "THE BASELINE BUILDER";
+      } else if (val.includes("disciplined and consistent")) {
+        arch = "THE UNSHAKEABLE PILLAR";
+      } else if (val.includes("unlock my full potential")) {
+        arch = "THE APEX CATALYST";
+      } else if (val.includes("peace and balance")) {
+        arch = "THE STOIC COMMANDER";
+      } else if (val.includes("transform myself completely")) {
+        arch = "THE SOVEREIGN CORE";
+      } else if (val.includes("high-performance lifestyle")) {
+        arch = "THE APEX CATALYST";
+      }
+      state.sessionData.userArchetype = arch;
+    }
   },
   
   // NEW PAGE — VALUES & PRIORITIES
@@ -2843,7 +2860,7 @@ function renderUserDashboard(viewWrap) {
   
   const focus = state.sessionData.focus_areas || state.sessionData.selectedTracks || [];
   const first_name = state.sessionData.basic_info?.first_name || 'Achiever';
-  const archetype = state.sessionData.generated_roadmap?.archetype || 'The Centered Pathfinder';
+  const archetype = state.sessionData.userArchetype || state.sessionData.generated_roadmap?.archetype || 'THE UNSHAKEABLE PILLAR';
   
   // Calculate and bind Life Map metrics
   const scores = calculateLifeMapMetrics();
