@@ -1943,6 +1943,7 @@ function renderHowWeSeeYou(viewWrap) {
 function calculateLifeMapMetrics() {
   const flow = state.sessionData.flow_responses || {};
   const focus = state.sessionData.focus_areas || [];
+  const addictions = state.sessionData.general_responses?.addictions_distractions || [];
 
   // 1. BODY (Gym & Fitness Training)
   let body = 85;
@@ -1955,7 +1956,6 @@ function calculateLifeMapMetrics() {
       body -= 15;
     }
   }
-  body = Math.min(100, Math.max(15, body));
 
   // 2. FUEL (Diet & Nutrition Balance)
   let fuel = 85;
@@ -1970,7 +1970,6 @@ function calculateLifeMapMetrics() {
       fuel -= 20;
     }
   }
-  fuel = Math.min(100, Math.max(15, fuel));
 
   // 3. REST (Sleep & Circadian Rhythm)
   let rest = 85;
@@ -1990,8 +1989,6 @@ function calculateLifeMapMetrics() {
   if (flow.gym_q2 === "7 or more days a week.") {
     rest -= 25;
   }
-  
-  rest = Math.min(100, Math.max(15, rest));
 
   // 4. MIND (Focus, Discipline & Study)
   let mind = 85;
@@ -2006,7 +2003,6 @@ function calculateLifeMapMetrics() {
       mind -= 10;
     }
   }
-  mind = Math.min(100, Math.max(15, mind));
 
   // 5. PURPOSE (Mental Health & Inner Peace)
   let purpose = 85;
@@ -2021,7 +2017,6 @@ function calculateLifeMapMetrics() {
       purpose -= 10;
     }
   }
-  purpose = Math.min(100, Math.max(15, purpose));
 
   // 6. CONNECTION (Relationships & Social Life)
   let connection = 85;
@@ -2036,6 +2031,50 @@ function calculateLifeMapMetrics() {
       connection -= 10;
     }
   }
+
+  // --- ADDICTIONS / HABITS DYNAMIC DEDUCTIONS ENGINE ---
+  // 1. Smoking / Vaping: -30 from BODY
+  if (addictions.includes('Smoking')) {
+    body -= 30;
+  }
+  
+  // 2. Alcohol: -12.5 from BODY and -12.5 from REST
+  if (addictions.includes('Alcohol')) {
+    body -= 12.5;
+    rest -= 12.5;
+  }
+  
+  // 3. Social Media / Phone Addiction: -20 from MIND
+  if (addictions.includes('Social media addiction') || addictions.includes('Phone addiction')) {
+    mind -= 20;
+  }
+  
+  // 4. Late-Night Scrolling: -25 from REST
+  if (addictions.includes('Late-night scrolling')) {
+    rest -= 25;
+  }
+  
+  // 5. Overeating: -20 from FUEL
+  if (addictions.includes('Overeating')) {
+    fuel -= 20;
+  }
+  
+  // 6. Constant Procrastination: -30 from PURPOSE
+  if (addictions.includes('Constant procrastination')) {
+    purpose -= 30;
+  }
+  
+  // 7. Overthinking / Negative Self-Talk: -25 from MIND
+  if (addictions.includes('Overthinking') || addictions.includes('Negative self-talk')) {
+    mind -= 25;
+  }
+
+  // --- ABSOLUTE MATH BOUNDARY GUARDS (Strict Floor [15%] and Ceiling [100%]) ---
+  body = Math.min(100, Math.max(15, body));
+  fuel = Math.min(100, Math.max(15, fuel));
+  rest = Math.min(100, Math.max(15, rest));
+  mind = Math.min(100, Math.max(15, mind));
+  purpose = Math.min(100, Math.max(15, purpose));
   connection = Math.min(100, Math.max(15, connection));
 
   return { body, mind, rest, fuel, connection, purpose };
