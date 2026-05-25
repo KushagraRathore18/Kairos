@@ -2597,16 +2597,13 @@ function renderRoadmapScreen(viewWrap) {
     
     lucide.createIcons();
     
-    // Fullscreen light beam transition event
     viewWrap.querySelector('#btn-enter-life').addEventListener('click', () => {
       const flash = viewWrap.querySelector('#flash-overlay');
       if (flash) {
         flash.classList.add('active');
         
-        // Loop back to start welcome screen after full visual flash
         setTimeout(() => {
-          initializeState();
-          renderActiveStep();
+          renderUserDashboard(viewWrap);
         }, 1500);
       }
     });
@@ -2961,6 +2958,957 @@ function showNotification(message) {
   toast.timeoutId = setTimeout(() => {
     toast.classList.remove('show');
   }, 3500);
+}
+
+// --- Dynamic Personalized User Dashboard Workspace ---
+function renderUserDashboard(viewWrap) {
+  // Hide standard onboarding header
+  const header = document.getElementById('app-header');
+  if (header) header.classList.remove('visible');
+  
+  viewWrap.className = 'dashboard-layout-container';
+  
+  const focus = state.sessionData.focus_areas || state.sessionData.selectedTracks || [];
+  const first_name = state.sessionData.basic_info?.first_name || 'Achiever';
+  const archetype = state.sessionData.generated_roadmap?.archetype || 'The Centered Pathfinder';
+  
+  // Calculate and bind Life Map metrics
+  const scores = calculateLifeMapMetrics();
+  
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r}, ${g}, ${b}`;
+  }
+
+  function getScoreColorStyle(score) {
+    if (score >= 70) return { hex: '#30D158', cls: 'score-high' };
+    if (score >= 40) return { hex: '#FFD60A', cls: 'score-mid' };
+    return { hex: '#FF453A', cls: 'score-low' };
+  }
+
+  const dimensionsList = [
+    { key: 'purpose', label: 'PURPOSE', desc: 'Focus & Life Intent', icon: 'target' },
+    { key: 'connection', label: 'CONNECTION', desc: 'Relationships & Social Vigor', icon: 'users' },
+    { key: 'body', label: 'BODY', desc: 'Fitness & Physical Stamina', icon: 'activity' },
+    { key: 'rest', label: 'REST', desc: 'Circadian Rest & Inner Peace', icon: 'moon' },
+    { key: 'fuel', label: 'FUEL', desc: 'Nutrition & Dietary Balance', icon: 'flame' },
+    { key: 'mind', label: 'MIND', desc: 'Attention Span & Discipline', icon: 'brain' }
+  ];
+
+  const sidebarHtml = dimensionsList.map(dim => {
+    const scoreVal = Math.round(scores[dim.key] || 85);
+    const styleInfo = getScoreColorStyle(scoreVal);
+    return `
+      <div class="lifemap-dimension-item glow-card" style="padding: 10px 14px; margin-bottom: 0;">
+        <div class="lifemap-dim-left">
+          <div class="lifemap-dim-icon-box" style="width:34px; height:34px; font-size:14px; color: ${styleInfo.hex}; border-color: rgba(${hexToRgb(styleInfo.hex)}, 0.18); background: rgba(${hexToRgb(styleInfo.hex)}, 0.04);">
+            <i data-lucide="${dim.icon}"></i>
+          </div>
+          <div class="lifemap-dim-details">
+            <span class="lifemap-dim-name" style="font-size:11px;">${dim.label}</span>
+            <span class="lifemap-dim-desc" style="font-size:10px;">${dim.desc}</span>
+          </div>
+        </div>
+        <div class="lifemap-dim-score ${styleInfo.cls}" style="font-size:13px;">
+          ${scoreVal}<span class="score-denominator" style="font-size:9px;">/100</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Build the conditional widgets feed
+  let widgetsHtml = '';
+  
+  // WIDGET 4: StudyVaultConsole pomodoro & Tasks (Render at top of feed)
+  if (focus.includes('Focus, Discipline & Study')) {
+    widgetsHtml += `
+      <div class="dashboard-widget-card wide-console animate-fade-in">
+        <div class="widget-header-group">
+          <div class="widget-icon-box accent-cyan">
+            <i data-lucide="zap"></i>
+          </div>
+          <div class="widget-header-details">
+            <span class="widget-title">Study & Focus Vault Console</span>
+            <span class="widget-subtitle">Interactive Pomodoro & task prioritization matrix</span>
+          </div>
+        </div>
+        
+        <div class="pomodoro-container">
+          <div class="pomodoro-timer-block">
+            <span class="pomodoro-time-display" id="pomodoro-time">25:00</span>
+            <div class="pomodoro-controls">
+              <button class="pomodoro-btn" id="btn-pomodoro-toggle">
+                <i data-lucide="play" id="pomodoro-icon"></i>
+                <span id="pomodoro-toggle-txt">Start Session</span>
+              </button>
+              <button class="pomodoro-btn" id="btn-pomodoro-reset">
+                <i data-lucide="rotate-ccw"></i>
+                <span>Reset</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="task-prioritizer-block">
+            <span class="widget-title" style="font-size: 14px;">Dominant Focus Task Queue</span>
+            <div class="task-input-row">
+              <input type="text" id="task-input-field" class="task-input" placeholder="Type a critical study/work task...">
+              <button class="btn-task-add" id="btn-add-task">
+                <i data-lucide="plus"></i>
+              </button>
+            </div>
+            <div class="tasks-list-feed" id="tasks-list-container">
+              <div class="task-item-card">
+                <div class="task-item-left">
+                  <div class="task-checkbox" data-id="1"><i data-lucide="check"></i></div>
+                  <span class="task-text">Complete deep work logic synthesis block</span>
+                </div>
+                <button class="btn-task-delete"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // WIDGET 1: FitnessTrackerWidget
+  if (focus.includes('Gym & Fitness Training')) {
+    const env = state.sessionData.flow_responses?.gym_q1 || 'Outdoors / Inactive';
+    const splitTarget = state.sessionData.flow_responses?.gym_q2 || '3 days a week';
+    
+    let daysHtml = '';
+    if (splitTarget.includes('4-5')) {
+      daysHtml = `
+        <div class="split-day-card">
+          <span class="split-day-title">Day 1</span>
+          <span class="split-day-focus">Upper Body Strength</span>
+          <span class="split-day-exercises">Bench Press: 3x8<br>Weighted Pullups: 3x6<br>Shoulder Press: 3x8</span>
+        </div>
+        <div class="split-day-card">
+          <span class="split-day-title">Day 2</span>
+          <span class="split-day-focus">Lower Body Power</span>
+          <span class="split-day-exercises">Squats: 3x6<br>Romanian Deadlifts: 3x8<br>Calf Raises: 3x15</span>
+        </div>
+        <div class="split-day-card">
+          <span class="split-day-title">Day 3</span>
+          <span class="split-day-focus">Conditioning & Core</span>
+          <span class="split-day-exercises">KB Swings: 4x15<br>Hanging Leg Raises: 3x12<br>Plank: 3x60s</span>
+        </div>
+      `;
+    } else {
+      daysHtml = `
+        <div class="split-day-card">
+          <span class="split-day-title">Day 1</span>
+          <span class="split-day-focus">Full Body (A)</span>
+          <span class="split-day-exercises">Squats: 3x8<br>Incline Bench: 3x10<br>Lat Pulldown: 3x10</span>
+        </div>
+        <div class="split-day-card">
+          <span class="split-day-title">Day 2</span>
+          <span class="split-day-focus">Full Body (B)</span>
+          <span class="split-day-exercises">Deadlifts: 3x5<br>Overhead Press: 3x8<br>Barbell Rows: 3x8</span>
+        </div>
+        <div class="split-day-card">
+          <span class="split-day-title">Day 3</span>
+          <span class="split-day-focus">Circadian Cardio</span>
+          <span class="split-day-exercises">Steady State Jog: 30m<br>Face Pulls: 3x15<br>Core Hinge Planks</span>
+        </div>
+      `;
+    }
+
+    const formAssistance = state.sessionData.flow_responses?.gym_q3 || [];
+    const hasFormHelp = Array.isArray(formAssistance) 
+      ? formAssistance.includes("I want to fix my exercise mechanics, form, and lifting execution.")
+      : formAssistance === "I want to fix my exercise mechanics, form, and lifting execution.";
+      
+    widgetsHtml += `
+      <div class="dashboard-widget-card animate-fade-in">
+        <div class="widget-header-group">
+          <div class="widget-icon-box accent-indigo">
+            <i data-lucide="activity"></i>
+          </div>
+          <div class="widget-header-details">
+            <span class="widget-title">Physical Fitness Split</span>
+            <span class="widget-subtitle">Environment: ${env} | Split: ${splitTarget}</span>
+          </div>
+        </div>
+        
+        <div class="training-split-grid">
+          ${daysHtml}
+        </div>
+        
+        ${hasFormHelp ? `
+          <button class="form-execution-btn" id="btn-show-form-help">
+            <i data-lucide="shield"></i>
+            <span>Open Form Execution Blueprints</span>
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  // WIDGET 2: FrictionlessNutritionWidget
+  if (focus.includes('Diet & Nutrition Balance')) {
+    widgetsHtml += `
+      <div class="dashboard-widget-card animate-fade-in">
+        <div class="widget-header-group">
+          <div class="widget-icon-box accent-purple">
+            <i data-lucide="apple"></i>
+          </div>
+          <div class="widget-header-details">
+            <span class="widget-title">Frictionless Nutrition Tracker</span>
+            <span class="widget-subtitle">AI natural-language single-sentence micro-logging</span>
+          </div>
+        </div>
+        
+        <div class="nutrition-widget-content">
+          <div class="nutrition-input-group">
+            <input type="text" id="nutrition-log-input" class="task-input" placeholder="E.g., had 3 boiled eggs and oatmeal...">
+            <button class="btn-nutrition-log" id="btn-log-nutrition">Log Meal</button>
+          </div>
+          
+          <div class="nutrition-tracker-bars">
+            <div class="nutrition-bar-label-row">
+              <span style="font-weight:600; color: var(--text-white);">Daily Protein Buffer</span>
+              <span id="protein-progress-text" style="color: var(--accent-cyan); font-weight:700;">32g / 150g</span>
+            </div>
+            <div class="nutrition-bar-wrapper">
+              <div class="nutrition-bar-fill protein" id="protein-progress-bar" style="width: 21%;"></div>
+            </div>
+          </div>
+          
+          <div class="meals-logged-feed" id="nutrition-feed-list">
+            <div class="logged-meal-item">
+              <span class="logged-meal-text">Initial Calibration Breakfast</span>
+              <span>AI Estimate: 32g Protein | 420 kcal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // WIDGET 3: CircadianClockWidget
+  if (focus.includes('Sleep & Circadian Rhythm')) {
+    widgetsHtml += `
+      <div class="dashboard-widget-card animate-fade-in">
+        <div class="widget-header-group">
+          <div class="widget-icon-box accent-indigo">
+            <i data-lucide="moon"></i>
+          </div>
+          <div class="widget-header-details">
+            <span class="widget-title">Circadian Clock & Sleep Gates</span>
+            <span class="widget-subtitle">Circadian alignment timeline & blue-light blockers</span>
+          </div>
+        </div>
+        
+        <div class="circadian-widget-content">
+          <div class="circadian-timeline-viz">
+            <div class="circadian-block sleep" style="width: 33%;">SLEEP GATES (10:30 PM)</div>
+            <div class="circadian-block wake" style="width: 67%;">OPTIMAL COGNITIVE WAKE (6:30 AM)</div>
+          </div>
+          <div class="circadian-timeline-markers">
+            <span>10:30 PM (Sleep)</span>
+            <span>6:30 AM (Wake)</span>
+            <span>10:30 PM (Sleep)</span>
+          </div>
+          
+          <div class="sunset-countdown-card">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:11px; font-weight:700; text-transform:uppercase; color: var(--text-secondary); letter-spacing:0.5px;">Digital Sunset Lock</span>
+              <span style="font-size:13px; font-weight:600; color: var(--text-white);">Melatonin Protection Active</span>
+            </div>
+            <span class="sunset-timer-display" id="circadian-sunset-countdown">02h 45m 12s</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // WIDGET 5: MentalClarityWidget
+  if (focus.includes('Mental Health & Inner Peace')) {
+    widgetsHtml += `
+      <div class="dashboard-widget-card animate-fade-in">
+        <div class="widget-header-group">
+          <div class="widget-icon-box accent-purple">
+            <i data-lucide="heart"></i>
+          </div>
+          <div class="widget-header-details">
+            <span class="widget-title">Morning Cognitive Synthesis</span>
+            <span class="widget-subtitle">Brain-dump thought deconstruction & somatic breathwork</span>
+          </div>
+        </div>
+        
+        <div class="mental-widget-content">
+          <textarea class="mental-dump-textarea" id="mental-brain-dump-input" placeholder="Type whatever is cluttering your mind right now. Let it flow without judgment..."></textarea>
+          <button class="form-execution-btn" id="btn-synthesize-clarity" style="color: var(--accent-purple); border-color: rgba(139,92,246,0.25); background: rgba(139,92,246,0.08);">
+            <i data-lucide="brain"></i>
+            <span>Synthesize Clarity Matrix</span>
+          </button>
+          
+          <div class="synthesized-clarity-box" id="synthesized-clarity-container" style="display: none;">
+            <div class="synthesized-title">
+              <i data-lucide="shield-check"></i>
+              <span>Extracted Focus Anchors</span>
+            </div>
+            <div class="synthesized-list" id="synthesized-clarity-list">
+              <!-- Synthesized list elements -->
+            </div>
+          </div>
+          
+          <div class="breathwork-card">
+            <div class="breathing-circle-wrapper">
+              <div class="breathing-circle-glow" id="breathing-glow-node"></div>
+            </div>
+            <div class="breathing-instructions">
+              <span class="breathing-text" id="breathing-txt">Somatic Respiration</span>
+              <span class="breathing-phase" id="breathing-phase-txt">Tap start to begin physiological down-regulation</span>
+            </div>
+            <button class="btn-bond-checkin" id="btn-breathing-toggle">Start</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // WIDGET 6: InnerCircleReminderCard
+  if (focus.includes('Relationships & Social Life')) {
+    widgetsHtml += `
+      <div class="dashboard-widget-card animate-fade-in">
+        <div class="widget-header-group">
+          <div class="widget-icon-box accent-cyan">
+            <i data-lucide="users"></i>
+          </div>
+          <div class="widget-header-details">
+            <span class="widget-title">Inner Circle Social Battery</span>
+            <span class="widget-subtitle">Connection checking loop and social stamina reserves</span>
+          </div>
+        </div>
+        
+        <div class="bonds-reminders-list">
+          <div class="bond-reminder-item">
+            <div class="bond-reminder-row">
+              <span class="bond-identity"><i data-lucide="heart" style="width:14px; color:#ff453a;"></i> Inner Family / Parent</span>
+              <span class="bond-due-badge" id="badge-bond-1">Check-in Due</span>
+            </div>
+            <div class="bond-actions-row">
+              <div class="bond-progress-wrapper">
+                <div class="bond-progress-fill" id="fill-bond-1" style="width: 40%;"></div>
+              </div>
+              <button class="btn-bond-checkin" data-bond="1">Log check-in</button>
+            </div>
+          </div>
+          
+          <div class="bond-reminder-item">
+            <div class="bond-reminder-row">
+              <span class="bond-identity"><i data-lucide="smile" style="width:14px; color:var(--accent-cyan);"></i> Closest Friend / Partner</span>
+              <span class="bond-due-badge checked-in" id="badge-bond-2">Synchronized</span>
+            </div>
+            <div class="bond-actions-row">
+              <div class="bond-progress-wrapper">
+                <div class="bond-progress-fill" id="fill-bond-2" style="width: 100%;"></div>
+              </div>
+              <button class="btn-bond-checkin" data-bond="2">Log check-in</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="social-battery-section">
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; color: var(--text-secondary); letter-spacing:0.5px;">Social Battery Reserves</span>
+            <span style="font-size:13px; font-weight:600; color: var(--text-white);">Cognitive Outward Capacity</span>
+          </div>
+          <div class="social-battery-container" id="social-battery-blocks">
+            <div class="social-battery-segment active" data-idx="0"></div>
+            <div class="social-battery-segment active" data-idx="1"></div>
+            <div class="social-battery-segment active" data-idx="2"></div>
+            <div class="social-battery-segment" data-idx="3"></div>
+            <div class="social-battery-segment" data-idx="4"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  viewWrap.innerHTML = `
+    <!-- Left Sidebar: Life Map & Profile Synthesis -->
+    <aside class="dashboard-sidebar animate-fade-in">
+      <div class="dashboard-profile-banner">
+        <div class="dashboard-avatar-glow">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <span class="dashboard-profile-title">${first_name}</span>
+        <span class="dashboard-profile-archetype">${archetype}</span>
+      </div>
+      
+      <div class="lifemap-dashboard-canvas-box">
+        <canvas id="life-map-canvas-dashboard"></canvas>
+      </div>
+      
+      <div class="lifemap-sidebar-list" style="display:flex; flex-direction:column; gap:10px;">
+        ${sidebarHtml}
+      </div>
+      
+      <button class="btn-premium" id="btn-dashboard-reset" style="background: rgba(255, 69, 58, 0.04); border-color: rgba(255, 69, 58, 0.2); color: #ff453a; width: 100%; border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">
+        <i data-lucide="rotate-ccw"></i>
+        <span>Reset & Retake Diagnostic</span>
+      </button>
+    </aside>
+    
+    <!-- Right Main Feed: Grid of Personalized Widgets -->
+    <main class="dashboard-main-grid">
+      ${widgetsHtml}
+    </main>
+
+    <!-- Custom Modal Overlay (squats execution blueprints etc) -->
+    <div class="premium-modal-overlay" id="dashboard-modal-overlay">
+      <div class="premium-modal-content">
+        <div class="modal-header">
+          <span class="modal-title" id="dashboard-modal-title">Form Review Blueprints</span>
+          <button class="btn-modal-close" id="btn-close-dashboard-modal">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body" id="dashboard-modal-body">
+          <div class="modal-item">
+            <div class="modal-item-title">1. Squat Depth & Hip Alignment</div>
+            <div style="font-size:12px;">Ensure hip crease drops completely below the top of your knee joint. Maintain thoracic spine packing and foot tripod pressure throughout the eccentric phase.</div>
+          </div>
+          <div class="modal-item">
+            <div class="modal-item-title">2. Shoulder Packing & Lat Engagement</div>
+            <div style="font-size:12px;">During overhead lifts or pulls, pack your scapula down and in. Visualize pulling your shoulder blades into your back pockets to secure the humerus base.</div>
+          </div>
+          <div class="modal-item">
+            <div class="modal-item-title">3. Core Bracing & Abdominal Pressure</div>
+            <div style="font-size:12px;">Do not just suck in your stomach. Breathe diaphragmatically and expand your core laterally 360 degrees to create internal skeletal stability.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Render Lucide icons
+  lucide.createIcons();
+
+  // --- Draw Dynamic Radar Chart on Sidebar Canvas ---
+  const canvas = viewWrap.querySelector('#life-map-canvas-dashboard');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = 360 * dpr;
+    canvas.height = 360 * dpr;
+    ctx.scale(dpr, dpr);
+
+    const cx = 180;
+    const cy = 180;
+    const maxRadius = 110;
+    const dimensions = [
+      { key: 'body', label: 'BODY' },
+      { key: 'mind', label: 'MIND' },
+      { key: 'rest', label: 'REST' },
+      { key: 'fuel', label: 'FUEL' },
+      { key: 'connection', label: 'CONNECTION' },
+      { key: 'purpose', label: 'PURPOSE' }
+    ];
+    const totalAxes = dimensions.length;
+    const angleStep = (Math.PI * 2) / totalAxes;
+    const startAngle = -Math.PI / 2;
+
+    let progress = 0;
+    const duration = 900;
+    const startTime = performance.now();
+
+    function drawDashboardRadar(time) {
+      const elapsed = time - startTime;
+      progress = Math.min(1, elapsed / duration);
+      
+      ctx.clearRect(0, 0, 360, 360);
+
+      // Concentric rings
+      const rings = 5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.lineWidth = 1;
+      for (let r = 1; r <= rings; r++) {
+        const radius = (r / rings) * maxRadius;
+        ctx.beginPath();
+        for (let i = 0; i < totalAxes; i++) {
+          const x = cx + Math.cos(startAngle + i * angleStep) * radius;
+          const y = cy + Math.sin(startAngle + i * angleStep) * radius;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      // Axis lines
+      for (let i = 0; i < totalAxes; i++) {
+        const angle = startAngle + i * angleStep;
+        const xOuter = cx + Math.cos(angle) * maxRadius;
+        const yOuter = cy + Math.sin(angle) * maxRadius;
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(xOuter, yOuter);
+        ctx.stroke();
+
+        // Label texts
+        const dim = dimensions[i];
+        const labelRadius = maxRadius + 14;
+        const labelX = cx + Math.cos(angle) * labelRadius;
+        const labelY = cy + Math.sin(angle) * labelRadius;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = "8px 'Outfit', sans-serif";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(dim.label, labelX, labelY);
+      }
+
+      // Draw active data polygon
+      const points = [];
+      for (let i = 0; i < totalAxes; i++) {
+        const dim = dimensions[i];
+        const scoreVal = scores[dim.key] || 85;
+        const radius = (scoreVal / 100) * maxRadius * progress;
+        const angle = startAngle + i * angleStep;
+        points.push({
+          x: cx + Math.cos(angle) * radius,
+          y: cy + Math.sin(angle) * radius
+        });
+      }
+
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.7)';
+      ctx.lineWidth = 2;
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.08)';
+      ctx.beginPath();
+      points.forEach((pt, idx) => {
+        if (idx === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Draw score vertices dot
+      points.forEach((pt, idx) => {
+        const dim = dimensions[idx];
+        const scoreVal = scores[dim.key] || 85;
+        const style = getScoreColorStyle(scoreVal);
+        ctx.fillStyle = style.hex;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(drawDashboardRadar);
+      }
+    }
+    requestAnimationFrame(drawDashboardRadar);
+  }
+
+  // --- EVENT LISTENERS & WIDGET FUNCTIONALITIES ---
+
+  // Reset retake diagnostic button
+  viewWrap.querySelector('#btn-dashboard-reset').addEventListener('click', () => {
+    clearDatabase()
+      .then(() => {
+        initializeState();
+        renderActiveStep();
+        showNotification("Diagnostic reset. Database cleaned.");
+      })
+      .catch(err => {
+        console.error("Failed to clear DB, resetting in memory:", err);
+        initializeState();
+        renderActiveStep();
+      });
+  });
+
+  // Modal actions
+  const modalOverlay = viewWrap.querySelector('#dashboard-modal-overlay');
+  const btnCloseModal = viewWrap.querySelector('#btn-close-dashboard-modal');
+  
+  if (btnCloseModal) {
+    btnCloseModal.addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
+    });
+  }
+  
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+    });
+  }
+
+  // Widget 1: Form Execution Blueprints Button
+  const btnFormHelp = viewWrap.querySelector('#btn-show-form-help');
+  if (btnFormHelp && modalOverlay) {
+    btnFormHelp.addEventListener('click', () => {
+      modalOverlay.classList.add('active');
+    });
+  }
+
+  // Widget 2: Natural Language Quick Nutrition Logging
+  const logNutBtn = viewWrap.querySelector('#btn-log-nutrition');
+  const nutInput = viewWrap.querySelector('#nutrition-log-input');
+  const nutFeed = viewWrap.querySelector('#nutrition-feed-list');
+  const pText = viewWrap.querySelector('#protein-progress-text');
+  const pBar = viewWrap.querySelector('#protein-progress-bar');
+  
+  let totalProtein = 32;
+  if (logNutBtn && nutInput) {
+    logNutBtn.addEventListener('click', () => {
+      const val = nutInput.value.trim();
+      if (!val) return;
+      
+      let pEst = 15;
+      let kcalEst = 320;
+      let name = val;
+      
+      // Dynamic parsing heuristic
+      const lower = val.toLowerCase();
+      if (lower.includes("chicken")) {
+        pEst = 35;
+        kcalEst = 400;
+      } else if (lower.includes("egg")) {
+        pEst = 18;
+        kcalEst = 220;
+      } else if (lower.includes("oat") || lower.includes("porridge")) {
+        pEst = 10;
+        kcalEst = 350;
+      } else if (lower.includes("shake") || lower.includes("protein")) {
+        pEst = 30;
+        kcalEst = 180;
+      } else if (lower.includes("beef") || lower.includes("meat")) {
+        pEst = 28;
+        kcalEst = 380;
+      } else if (lower.includes("salad")) {
+        pEst = 5;
+        kcalEst = 120;
+      }
+
+      totalProtein += pEst;
+      
+      // Update UI
+      nutInput.value = '';
+      pText.innerText = `${totalProtein}g / 150g`;
+      pBar.style.width = `${Math.min(100, (totalProtein / 150) * 100)}%`;
+      
+      const item = document.createElement('div');
+      item.className = 'logged-meal-item';
+      item.style.animation = 'fadeIn 0.3s ease';
+      item.innerHTML = `
+        <span class="logged-meal-text">${name}</span>
+        <span>AI Estimate: ${pEst}g Protein | ${kcalEst} kcal</span>
+      `;
+      nutFeed.insertBefore(item, nutFeed.firstChild);
+      
+      showNotification(`Logged: +${pEst}g Protein calculated.`);
+    });
+  }
+
+  // Widget 3: Digital Sunset Screen-Lock Countdown
+  const countdownEl = viewWrap.querySelector('#circadian-sunset-countdown');
+  if (countdownEl) {
+    let hrs = 2;
+    let mins = 45;
+    let secs = 12;
+    
+    const countInterval = setInterval(() => {
+      if (!viewWrap.querySelector('#circadian-sunset-countdown')) {
+        clearInterval(countInterval);
+        return;
+      }
+      
+      secs--;
+      if (secs < 0) {
+        secs = 59;
+        mins--;
+        if (mins < 0) {
+          mins = 59;
+          hrs--;
+          if (hrs < 0) {
+            hrs = 0; mins = 0; secs = 0;
+            clearInterval(countInterval);
+          }
+        }
+      }
+      
+      const hs = hrs.toString().padStart(2, '0');
+      const ms = mins.toString().padStart(2, '0');
+      const ss = secs.toString().padStart(2, '0');
+      countdownEl.innerText = `${hs}h ${ms}m ${ss}s`;
+    }, 1000);
+  }
+
+  // Widget 4: Pomodoro & Study Vault
+  const pTime = viewWrap.querySelector('#pomodoro-time');
+  const pToggle = viewWrap.querySelector('#btn-pomodoro-toggle');
+  const pReset = viewWrap.querySelector('#btn-pomodoro-reset');
+  const pTxt = viewWrap.querySelector('#pomodoro-toggle-txt');
+  const pIcon = viewWrap.querySelector('#pomodoro-icon');
+  
+  let pMins = 25;
+  let pSecs = 0;
+  let pInterval = null;
+  let pRunning = false;
+  
+  if (pToggle && pReset) {
+    pToggle.addEventListener('click', () => {
+      pRunning = !pRunning;
+      if (pRunning) {
+        pToggle.classList.add('active-play');
+        pTxt.innerText = 'Pause Focus';
+        pIcon.setAttribute('data-lucide', 'pause');
+        lucide.createIcons();
+        
+        pInterval = setInterval(() => {
+          if (!viewWrap.querySelector('#pomodoro-time')) {
+            clearInterval(pInterval);
+            return;
+          }
+          pSecs--;
+          if (pSecs < 0) {
+            pSecs = 59;
+            pMins--;
+            if (pMins < 0) {
+              clearInterval(pInterval);
+              pRunning = false;
+              pMins = 25; pSecs = 0;
+              pToggle.classList.remove('active-play');
+              pTxt.innerText = 'Start Session';
+              pIcon.setAttribute('data-lucide', 'play');
+              lucide.createIcons();
+              showNotification("Focus session complete! Rest 5m.");
+            }
+          }
+          const ms = pMins.toString().padStart(2, '0');
+          const ss = pSecs.toString().padStart(2, '0');
+          pTime.innerText = `${ms}:${ss}`;
+        }, 1000);
+      } else {
+        clearInterval(pInterval);
+        pToggle.classList.remove('active-play');
+        pTxt.innerText = 'Resume Focus';
+        pIcon.setAttribute('data-lucide', 'play');
+        lucide.createIcons();
+      }
+    });
+    
+    pReset.addEventListener('click', () => {
+      clearInterval(pInterval);
+      pRunning = false;
+      pMins = 25; pSecs = 0;
+      pTime.innerText = '25:00';
+      pToggle.classList.remove('active-play');
+      pTxt.innerText = 'Start Session';
+      pIcon.setAttribute('data-lucide', 'play');
+      lucide.createIcons();
+    });
+  }
+
+  // Active task prioritization list
+  const btnAddTask = viewWrap.querySelector('#btn-add-task');
+  const taskField = viewWrap.querySelector('#task-input-field');
+  const tasksFeed = viewWrap.querySelector('#tasks-list-container');
+  
+  if (btnAddTask && taskField && tasksFeed) {
+    btnAddTask.addEventListener('click', () => {
+      const val = taskField.value.trim();
+      if (!val) return;
+      
+      const item = document.createElement('div');
+      item.className = 'task-item-card';
+      item.style.animation = 'fadeIn 0.3s ease';
+      item.innerHTML = `
+        <div class="task-item-left">
+          <div class="task-checkbox"><i data-lucide="check"></i></div>
+          <span class="task-text">${val}</span>
+        </div>
+        <button class="btn-task-delete"><i data-lucide="trash-2"></i></button>
+      `;
+      tasksFeed.appendChild(item);
+      taskField.value = '';
+      lucide.createIcons();
+      
+      // Bind checkbox toggles
+      const chk = item.querySelector('.task-checkbox');
+      chk.addEventListener('click', () => {
+        chk.classList.toggle('checked');
+        const txt = item.querySelector('.task-text');
+        txt.classList.toggle('completed');
+        item.classList.toggle('completed');
+        
+        if (chk.classList.contains('checked')) {
+          showNotification("Task priority cleared.");
+        }
+      });
+      
+      // Bind delete button
+      item.querySelector('.btn-task-delete').addEventListener('click', () => {
+        item.remove();
+      });
+    });
+    
+    // Bind initial pre-existing task item
+    const preChk = tasksFeed.querySelector('.task-checkbox');
+    if (preChk) {
+      preChk.addEventListener('click', () => {
+        preChk.classList.toggle('checked');
+        const item = tasksFeed.querySelector('.task-item-card');
+        const txt = item.querySelector('.task-text');
+        txt.classList.toggle('completed');
+        item.classList.toggle('completed');
+        if (preChk.classList.contains('checked')) {
+          showNotification("Task priority cleared.");
+        }
+      });
+      tasksFeed.querySelector('.btn-task-delete').addEventListener('click', () => {
+        tasksFeed.querySelector('.task-item-card').remove();
+      });
+    }
+  }
+
+  // Widget 5: Cognitive Synthesis Morning Brain Dump
+  const btnSynth = viewWrap.querySelector('#btn-synthesize-clarity');
+  const dumpField = viewWrap.querySelector('#mental-brain-dump-input');
+  const synthContainer = viewWrap.querySelector('#synthesized-clarity-container');
+  const synthList = viewWrap.querySelector('#synthesized-clarity-list');
+  
+  if (btnSynth && dumpField && synthContainer) {
+    btnSynth.addEventListener('click', () => {
+      const val = dumpField.value.trim();
+      if (!val) return;
+      
+      btnSynth.innerHTML = `<div class="spinner-ring" style="width:16px; height:16px; border-width:2px; margin-right:6px;"></div><span>Extracting focus vectors...</span>`;
+      btnSynth.setAttribute('disabled', 'true');
+      
+      setTimeout(() => {
+        btnSynth.innerHTML = `<i data-lucide="brain"></i><span>Synthesize Clarity Matrix</span>`;
+        btnSynth.removeAttribute('disabled');
+        lucide.createIcons();
+        
+        // Generate dynamic lists based on what they type
+        let priorities = [
+          "Focus on immediate actions rather than planning loops.",
+          "Identify and secure digital boundaries. Screen off by 9:30 PM.",
+          "Divide and isolate large focus tasks to secure cognitive capacity."
+        ];
+        
+        const lower = val.toLowerCase();
+        if (lower.includes("exam") || lower.includes("study") || lower.includes("work")) {
+          priorities = [
+            "Block out exactly 2 focus blocks of 50 minutes for heavy revision/work.",
+            "De-clutter tabs and use the digital vault Pomodoro timer exclusively.",
+            "Take 10 minutes offline breaks in between sessions to recover cognitive energy."
+          ];
+        } else if (lower.includes("tired") || lower.includes("sleep") || lower.includes("exhaust")) {
+          priorities = [
+            "Initiate an early circadian sunset wind-down boundary. No phone in bed.",
+            "Establish direct morning sunlight access (10 mins) right after waking up.",
+            "Hydrate heavily and drop caffeine intake after 1:00 PM."
+          ];
+        }
+        
+        synthList.innerHTML = priorities.map((p, idx) => `
+          <div>${idx + 1}. ${p}</div>
+        `).join('');
+        
+        synthContainer.style.display = 'flex';
+        dumpField.value = '';
+        showNotification("Thought clutter structured.");
+      }, 1200);
+    });
+  }
+
+  // Somatic Respiration breathing timer
+  const breathingBtn = viewWrap.querySelector('#btn-breathing-toggle');
+  const breathingCircle = viewWrap.querySelector('#breathing-glow-node');
+  const breathingPhaseTxt = viewWrap.querySelector('#breathing-phase-txt');
+  
+  let breathingActive = false;
+  let breathingInterval = null;
+  let breathingPhase = 0; // 0: Inhale, 1: Hold, 2: Exhale, 3: Hold
+  
+  if (breathingBtn && breathingCircle) {
+    breathingBtn.addEventListener('click', () => {
+      breathingActive = !breathingActive;
+      if (breathingActive) {
+        breathingBtn.innerText = 'Stop';
+        breathingBtn.style.background = 'rgba(255, 69, 58, 0.15)';
+        breathingBtn.style.color = '#ff453a';
+        breathingBtn.style.borderColor = 'rgba(255, 69, 58, 0.3)';
+        
+        breathingPhase = 0;
+        breathingCircle.className = 'breathing-circle-glow inhale';
+        breathingPhaseTxt.innerText = 'Inhale deeply... (4s)';
+        
+        breathingInterval = setInterval(() => {
+          breathingPhase = (breathingPhase + 1) % 4;
+          if (breathingPhase === 0) {
+            breathingCircle.className = 'breathing-circle-glow inhale';
+            breathingPhaseTxt.innerText = 'Inhale deeply... (4s)';
+          } else if (breathingPhase === 1) {
+            breathingCircle.className = 'breathing-circle-glow hold';
+            breathingPhaseTxt.innerText = 'Hold the breath... (4s)';
+          } else if (breathingPhase === 2) {
+            breathingCircle.className = 'breathing-circle-glow exhale';
+            breathingPhaseTxt.innerText = 'Exhale fully... (4s)';
+          } else if (breathingPhase === 3) {
+            breathingCircle.className = 'breathing-circle-glow hold';
+            breathingPhaseTxt.innerText = 'Hold empty... (4s)';
+          }
+        }, 4000);
+      } else {
+        clearInterval(breathingInterval);
+        breathingBtn.innerText = 'Start';
+        breathingBtn.style.background = '';
+        breathingBtn.style.color = '';
+        breathingBtn.style.borderColor = '';
+        breathingCircle.className = 'breathing-circle-glow';
+        breathingPhaseTxt.innerText = 'Tap start to begin physiological down-regulation';
+      }
+    });
+  }
+
+  // Widget 6: Inner Circle reminder click logs & battery stamina cells
+  const checkinBtns = viewWrap.querySelectorAll('.btn-bond-checkin[data-bond]');
+  checkinBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = btn.getAttribute('data-bond');
+      const fill = viewWrap.querySelector(`#fill-bond-${idx}`);
+      const badge = viewWrap.querySelector(`#badge-bond-${idx}`);
+      
+      if (fill && badge) {
+        fill.style.width = '100%';
+        badge.innerText = 'Synchronized';
+        badge.className = 'bond-due-badge checked-in';
+        showNotification("Check-in logged. Bonds secured.");
+      }
+    });
+  });
+
+  // Battery stamina cells click behaviors
+  const segments = viewWrap.querySelectorAll('.social-battery-segment');
+  segments.forEach(seg => {
+    seg.addEventListener('click', () => {
+      const targetIdx = parseInt(seg.getAttribute('data-idx'));
+      segments.forEach((s, idx) => {
+        if (idx <= targetIdx) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+      showNotification(`Battery adjusted: ${targetIdx + 1}/5 cells.`);
+    });
+  });
 }
 
 // --- App Entry Initialization ---
