@@ -757,21 +757,7 @@ const ALL_FLOW_NODES = {
     save: (vals) => { state.sessionData.general_responses.future_self_vision = vals; }
   },
 
-  // NEW PAGE — FINAL MINDSET CHECK
-  final_mindset: {
-    type: 'single',
-    title: 'What kind of life are you trying to build?',
-    subtitle: '',
-    options: [
-      { id: 'mnd_peace', text: 'A peaceful and balanced life', desc: 'Prioritizing rest, mindfulness, clean routines, and calm.', icon: 'wind' },
-      { id: 'mnd_success', text: 'A disciplined and successful life', desc: 'Reaching professional peaks, building financial security.', icon: 'shield' },
-      { id: 'mnd_confident', text: 'A confident and respected life', desc: 'Standing tall in the community, building strong boundaries.', icon: 'users' },
-      { id: 'mnd_healthy', text: 'A healthy and energetic life', desc: 'Fueling my biology, waking up with power and athletic vigor.', icon: 'activity' },
-      { id: 'mnd_meaning', text: 'A meaningful and purposeful life', desc: 'Connecting my career, relationships, and actions to a calling.', icon: 'target' },
-      { id: 'mnd_transform', text: 'A complete personal transformation', desc: 'Rebuilding body, mind, habits, and career from the ground up.', icon: 'sparkles' }
-    ],
-    save: (val) => { state.sessionData.general_responses.final_mindset = val; }
-  },
+
 
   // NEW PAGE — AI ANALYSIS LOADING
   ai_analysis_loading: {
@@ -998,7 +984,6 @@ function buildDynamicQueue() {
     'routine_confidence',
     'addictions_distractions',
     'challenge_intensity',
-    'final_mindset',
     'profile_life_map',
     'ai_analysis_loading',
     'how_we_see_you',
