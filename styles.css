@@ -3256,6 +3256,9 @@ html, body {
 }
 
 .mogging-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
   max-width: 800px;
   text-align: center;
   padding: 40px;
@@ -3265,6 +3268,8 @@ html, body {
   justify-content: center;
   gap: 32px;
   animation: moggingEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 @keyframes moggingEntrance {
@@ -3279,24 +3284,42 @@ html, body {
 }
 
 .mogging-skull-icon {
-  font-size: 80px;
-  color: #ff453a;
-  filter: drop-shadow(0 0 20px rgba(255, 69, 58, 0.6));
-  animation: skullPulse 1.8s ease-in-out infinite alternate;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  width: 540px;
+  height: 540px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0.11; /* Subtle, prominent glowing red skull backdrop graphic */
+}
+
+.mogging-skull-icon i, .mogging-skull-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+  color: #ff453a !important;
+  filter: drop-shadow(0 0 60px rgba(255, 69, 58, 0.8));
+  animation: skullPulse 2s ease-in-out infinite alternate;
 }
 
 @keyframes skullPulse {
   0% {
     transform: scale(1);
-    filter: drop-shadow(0 0 15px rgba(255, 69, 58, 0.4));
+    filter: drop-shadow(0 0 35px rgba(255, 69, 58, 0.5));
   }
   100% {
     transform: scale(1.1);
-    filter: drop-shadow(0 0 35px rgba(255, 69, 58, 0.9));
+    filter: drop-shadow(0 0 75px rgba(255, 69, 58, 0.95));
   }
 }
 
 .mogging-text {
+  position: relative;
+  z-index: 10; /* Keeps text layered perfectly on top */
   font-family: 'Outfit', sans-serif;
   font-size: 42px;
   font-weight: 900;
@@ -3313,9 +3336,15 @@ html, body {
   .mogging-text {
     font-size: 28px;
   }
+  .mogging-skull-icon {
+    width: 320px;
+    height: 320px;
+  }
 }
 
 .mogging-btn {
+  position: relative;
+  z-index: 10; /* Keeps action button layered perfectly on top */
   margin-top: 16px;
   box-shadow: 0 0 30px rgba(255, 69, 58, 0.2);
   transition: all 0.3s ease;
@@ -3327,6 +3356,7 @@ html, body {
   box-shadow: 0 0 40px rgba(255, 69, 58, 0.6);
   transform: scale(1.05);
 }
+
 
 
 

@@ -3119,8 +3119,143 @@ function renderUserDashboard(viewWrap) {
     `;
   }).join('');
 
+  // --- Personalized Dynamic Program & Tracking Matrix Setup ---
+  const dailyTasksMap = {
+    'Gym & Fitness Training': {
+      text: "Complete 90-minute structured physical training split block",
+      dim: "body"
+    },
+    'Diet & Nutrition Balance': {
+      text: "Log all meals in natural language & maintain positive protein buffer",
+      dim: "fuel"
+    },
+    'Sleep & Circadian Rhythm': {
+      text: "Lock screen & protect melatonin boundary before Circadian Sunset",
+      dim: "rest"
+    },
+    'Focus, Discipline & Study': {
+      text: "Execute 2 Pomodoro focus sessions & clear Dominant Task Queue",
+      dim: "mind"
+    },
+    'Mental Health & Inner Peace': {
+      text: "Perform somatic breathwork down-regulation & write Morning brain-dump",
+      dim: "purpose"
+    },
+    'Relationships & Social Life': {
+      text: "Verify Inner Circle check-ins & check Social Battery outward capacity",
+      dim: "connection"
+    }
+  };
+
+  const weeklyMissionsMap = {
+    'Gym & Fitness Training': {
+      text: "Complete 3 structured workout sessions without friction",
+      dim: "body"
+    },
+    'Diet & Nutrition Balance': {
+      text: "Log clean nutrition macros consistently for 5 days",
+      dim: "fuel"
+    },
+    'Sleep & Circadian Rhythm': {
+      text: "Secure solid sleep gates timeline with zero bedtime procrastination",
+      dim: "rest"
+    },
+    'Focus, Discipline & Study': {
+      text: "Conquer all study tasks without tabs-switching friction",
+      dim: "mind"
+    },
+    'Mental Health & Inner Peace': {
+      text: "Synthesize cognitive clarity anchors every single morning",
+      dim: "purpose"
+    },
+    'Relationships & Social Life': {
+      text: "Ensure all close family/friend connections are fully Synchronized",
+      dim: "connection"
+    }
+  };
+
+  let dailyItemsHtml = '';
+  let weeklyItemsHtml = '';
+
+  focus.forEach((track, index) => {
+    const dailyInfo = dailyTasksMap[track];
+    if (dailyInfo) {
+      dailyItemsHtml += `
+        <div class="task-item-card daily-track-item" data-dim="${dailyInfo.dim}" data-index="${index}" style="margin-bottom:0; background:rgba(0,0,0,0.2);">
+          <div class="task-item-left">
+            <div class="task-checkbox tracking-chk"><i data-lucide="check"></i></div>
+            <span class="task-text" style="font-size:12px;">${dailyInfo.text}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    const weeklyInfo = weeklyMissionsMap[track];
+    if (weeklyInfo) {
+      weeklyItemsHtml += `
+        <div class="task-item-card weekly-track-item" data-dim="${weeklyInfo.dim}" data-index="${index}" style="margin-bottom:0; background:rgba(0,0,0,0.2);">
+          <div class="task-item-left">
+            <div class="task-checkbox tracking-chk"><i data-lucide="check"></i></div>
+            <span class="task-text" style="font-size:12px;">${weeklyInfo.text}</span>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  if (dailyItemsHtml === '') {
+    dailyItemsHtml = `
+      <div style="font-size:11px; color:var(--text-secondary); text-align:center; padding:16px;">
+        No active focus areas enqueued. Choose tracks to populate.
+      </div>
+    `;
+  }
+  if (weeklyItemsHtml === '') {
+    weeklyItemsHtml = `
+      <div style="font-size:11px; color:var(--text-secondary); text-align:center; padding:16px;">
+        No active focus areas enqueued. Choose tracks to populate.
+      </div>
+    `;
+  }
+
   // Build the conditional widgets feed
-  let widgetsHtml = '';
+  let widgetsHtml = `
+    <div class="dashboard-widget-card wide-console animate-fade-in" style="background: rgba(10, 15, 30, 0.45); border-color: rgba(6, 182, 212, 0.15);">
+      <div class="widget-header-group">
+        <div class="widget-icon-box accent-cyan">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <div class="widget-header-details">
+          <span class="widget-title">Personalized Program Tracking Matrix</span>
+          <span class="widget-subtitle">Interactive daily execution & weekly core missions tracker</span>
+        </div>
+      </div>
+      
+      <div class="tracking-matrix-layout" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; width: 100%;">
+        <!-- Daily Execution List -->
+        <div class="tracking-section-block" style="display:flex; flex-direction:column; gap:10px;">
+          <div class="tracking-block-title" style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--text-white); font-size:13px; margin-bottom:4px; letter-spacing:0.5px; text-transform:uppercase; font-family:'Outfit', sans-serif;">
+            <i data-lucide="sun" style="width:14px; color:#ffd60a;"></i>
+            <span>Daily Execution Protocol</span>
+          </div>
+          <div class="tracking-list-feed" id="daily-matrix-container" style="display:flex; flex-direction:column; gap:8px;">
+            ${dailyItemsHtml}
+          </div>
+        </div>
+        
+        <!-- Weekly Missions List -->
+        <div class="tracking-section-block" style="display:flex; flex-direction:column; gap:10px;">
+          <div class="tracking-block-title" style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--text-white); font-size:13px; margin-bottom:4px; letter-spacing:0.5px; text-transform:uppercase; font-family:'Outfit', sans-serif;">
+            <i data-lucide="calendar" style="width:14px; color:var(--accent-indigo);"></i>
+            <span>Weekly Core Missions</span>
+          </div>
+          <div class="tracking-list-feed" id="weekly-matrix-container" style="display:flex; flex-direction:column; gap:8px;">
+            ${weeklyItemsHtml}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
   
   // WIDGET 4: StudyVaultConsole pomodoro & Tasks (Render at top of feed)
   if (focus.includes('Focus, Discipline & Study')) {
@@ -3520,10 +3655,7 @@ function renderUserDashboard(viewWrap) {
     const duration = 900;
     const startTime = performance.now();
 
-    function drawDashboardRadar(time) {
-      const elapsed = time - startTime;
-      progress = Math.min(1, elapsed / duration);
-      
+    function renderRadarFrame(progressVal) {
       ctx.clearRect(0, 0, 360, 360);
 
       // Concentric rings
@@ -3573,7 +3705,7 @@ function renderUserDashboard(viewWrap) {
       for (let i = 0; i < totalAxes; i++) {
         const dim = dimensions[i];
         const scoreVal = scores[dim.key] || 85;
-        const radius = (scoreVal / 100) * maxRadius * progress;
+        const radius = (scoreVal / 100) * maxRadius * progressVal;
         const angle = startAngle + i * angleStep;
         points.push({
           x: cx + Math.cos(angle) * radius,
@@ -3606,12 +3738,21 @@ function renderUserDashboard(viewWrap) {
         ctx.lineWidth = 1;
         ctx.stroke();
       });
+    }
 
+    function drawDashboardRadar(time) {
+      const elapsed = time - startTime;
+      progress = Math.min(1, elapsed / duration);
+      renderRadarFrame(progress);
       if (progress < 1) {
         requestAnimationFrame(drawDashboardRadar);
       }
     }
     requestAnimationFrame(drawDashboardRadar);
+
+    window.triggerRadarUpdate = () => {
+      renderRadarFrame(1);
+    };
   }
 
   // --- EVENT LISTENERS & WIDGET FUNCTIONALITIES ---
@@ -4008,6 +4149,59 @@ function renderUserDashboard(viewWrap) {
         }
       });
       showNotification(`Battery adjusted: ${targetIdx + 1}/5 cells.`);
+    });
+  });
+
+  // --- Tracking Matrix Checklist Bindings ---
+  const trackingCheckboxes = viewWrap.querySelectorAll('.tracking-chk');
+  trackingCheckboxes.forEach(chk => {
+    chk.addEventListener('click', () => {
+      chk.classList.toggle('checked');
+      const item = chk.closest('.task-item-card');
+      const txt = item.querySelector('.task-text');
+      txt.classList.toggle('completed');
+      item.classList.toggle('completed');
+      
+      const dim = item.getAttribute('data-dim');
+      const isDaily = item.classList.contains('daily-track-item');
+      
+      // Calculate delta to add/remove live
+      const delta = chk.classList.contains('checked') ? (isDaily ? 5 : 10) : (isDaily ? -5 : -10);
+      
+      // Apply delta directly to local scores copy
+      scores[dim] = Math.min(100, Math.max(15, (scores[dim] || 85) + delta));
+      
+      // Update HTML text representation on the sidebar
+      const sidebarItems = Array.from(viewWrap.querySelectorAll('.lifemap-dimension-item'));
+      const targetItem = sidebarItems.find(el => el.innerHTML.toUpperCase().includes(dim.toUpperCase()));
+      if (targetItem) {
+        const sidebarScoreEl = targetItem.querySelector('.lifemap-dim-score');
+        if (sidebarScoreEl) {
+          const scoreVal = Math.round(scores[dim]);
+          const styleInfo = getScoreColorStyle(scoreVal);
+          
+          sidebarScoreEl.className = `lifemap-dim-score ${styleInfo.cls}`;
+          sidebarScoreEl.style.color = styleInfo.hex;
+          sidebarScoreEl.innerHTML = `${scoreVal}<span class="score-denominator" style="font-size:9px;">/100</span>`;
+          
+          // Also update icon box color for premium visual synchronization
+          const iconBox = targetItem.querySelector('.lifemap-dim-icon-box');
+          if (iconBox) {
+            iconBox.style.color = styleInfo.hex;
+            iconBox.style.borderColor = `rgba(${hexToRgb(styleInfo.hex)}, 0.18)`;
+            iconBox.style.background = `rgba(${hexToRgb(styleInfo.hex)}, 0.04)`;
+          }
+        }
+      }
+      
+      // Redraw canvas radar chart in real-time
+      if (window.triggerRadarUpdate) {
+        window.triggerRadarUpdate();
+      }
+      
+      if (chk.classList.contains('checked')) {
+        showNotification(`Macro growth synced: +${isDaily ? 5 : 10}% ${dim.toUpperCase()} progress.`);
+      }
     });
   });
 }
