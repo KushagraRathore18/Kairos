@@ -1794,71 +1794,70 @@ function calculateLifeMapMetrics() {
 }
 
 // SCREEN: Premium Profile & Dynamic Life Map Radar Visualizer
+// SCREEN: Premium Profile & Dynamic Life Map Radar Visualizer
 function renderProfileLifeMap(viewWrap) {
   const scores = calculateLifeMapMetrics();
   
+  // Simple hex to rgb converter for custom styles
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r}, ${g}, ${b}`;
+  }
+
+  // Helper to determine dynamic glowing colors based on scores
+  function getScoreColorStyle(score) {
+    if (score >= 70) return { hex: '#30D158', cls: 'score-high' };
+    if (score >= 40) return { hex: '#FFD60A', cls: 'score-mid' };
+    return { hex: '#FF453A', cls: 'score-low' };
+  }
+
+  const dimensionsList = [
+    { key: 'purpose', label: 'PURPOSE', desc: 'Focus & Life Intent', icon: 'target' },
+    { key: 'connection', label: 'CONNECTION', desc: 'Relationships & Social Vigor', icon: 'users' },
+    { key: 'body', label: 'BODY', desc: 'Fitness & Physical Stamina', icon: 'activity' },
+    { key: 'rest', label: 'REST', desc: 'Circadian Rest & Inner Peace', icon: 'moon' },
+    { key: 'fuel', label: 'FUEL', desc: 'Nutrition & Dietary Balance', icon: 'flame' },
+    { key: 'mind', label: 'MIND', desc: 'Attention Span & Discipline', icon: 'brain' }
+  ];
+
+  const sidebarHtml = dimensionsList.map(dim => {
+    const scoreVal = Math.round(scores[dim.key]);
+    const styleInfo = getScoreColorStyle(scoreVal);
+    return `
+      <div class="lifemap-dimension-item glow-card">
+        <div class="lifemap-dim-left">
+          <div class="lifemap-dim-icon-box" style="color: ${styleInfo.hex}; border-color: rgba(${hexToRgb(styleInfo.hex)}, 0.18); background: rgba(${hexToRgb(styleInfo.hex)}, 0.04);">
+            <i data-lucide="${dim.icon}"></i>
+          </div>
+          <div class="lifemap-dim-details">
+            <span class="lifemap-dim-name">${dim.label}</span>
+            <span class="lifemap-dim-desc">${dim.desc}</span>
+          </div>
+        </div>
+        <div class="lifemap-dim-score ${styleInfo.cls}">
+          ${scoreVal}<span class="score-denominator">/100</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
   viewWrap.innerHTML = `
     <div class="question-header">
       <span class="question-pre">Identity Fusion</span>
-      <h2 class="question-title">Synthesize Your Life Map</h2>
-      <p class="question-desc">Lock in your credentials to secure your Stoic character profile and compile your personalized transformation program.</p>
+      <h2 class="question-title">Your Life Map</h2>
+      <p class="question-desc">We have compiled a baseline heuristic of your biological and cognitive habits across six core dimensions.</p>
     </div>
 
     <div class="profile-map-layout">
-      <!-- Left Side: Profile Form -->
-      <div class="profile-form-card animate-fade-in">
-        <div class="profile-card-header">
-          <span class="profile-card-title">
-            <i data-lucide="shield-check" style="color: var(--accent-cyan);"></i>
-            Secure Your Profile
-          </span>
-          <p class="profile-card-desc">Create your local credentials. Your data is stored fully privately on your device.</p>
-        </div>
-
-        <form id="profile-form" class="profile-form" novalidate>
-          <div class="form-group">
-            <label for="prof-username" class="input-label">Username</label>
-            <div class="input-wrapper">
-              <i data-lucide="user" class="input-icon"></i>
-              <input type="text" id="prof-username" class="input-premium has-icon" placeholder="Choose a name" autocomplete="username">
-            </div>
-            <span class="validation-error" id="error-username">Username is required</span>
-          </div>
-
-          <div class="form-group">
-            <label for="prof-email" class="input-label">Email Address</label>
-            <div class="input-wrapper">
-              <i data-lucide="mail" class="input-icon"></i>
-              <input type="email" id="prof-email" class="input-premium has-icon" placeholder="your.name@domain.com" autocomplete="email">
-            </div>
-            <span class="validation-error" id="error-email">Please enter a valid email address</span>
-          </div>
-
-          <div class="form-group">
-            <label for="prof-password" class="input-label">Password</label>
-            <div class="input-wrapper">
-              <i data-lucide="lock" class="input-icon"></i>
-              <input type="password" id="prof-password" class="input-premium has-icon" placeholder="Min. 6 characters" autocomplete="new-password">
-            </div>
-            <span class="validation-error" id="error-password">Password must be at least 6 characters</span>
-          </div>
-
-          <div class="profile-terms">
-            By proceeding, you agree to compile and encrypt your baseline metrics inside Kairos' IndexedDB storage.
-          </div>
-        </form>
+      <!-- Left Side: Sidebar of dimensions -->
+      <div class="lifemap-sidebar animate-fade-in">
+        ${sidebarHtml}
       </div>
 
-      <!-- Right Side: Radar Chart Visualizer -->
-      <div class="map-visualizer-card animate-fade-in">
-        <div class="profile-card-header" style="align-self: flex-start; width: 100%;">
-          <span class="profile-card-title">
-            <i data-lucide="compass" style="color: var(--accent-purple);"></i>
-            Your Baseline Life Map
-          </span>
-          <p class="profile-card-desc">Heuristic mapping across six biological and cognitive dimensions.</p>
-        </div>
-
+      <!-- Right Side: Radar Chart Visualizer (Centered Focal Point) -->
+      <div class="map-visualizer-card animate-fade-in centered-map-card">
         <div class="map-canvas-container">
           <canvas id="life-map-canvas"></canvas>
         </div>
@@ -1867,8 +1866,8 @@ function renderProfileLifeMap(viewWrap) {
 
     <div class="action-bar">
       <button id="btn-lock-profile" class="btn-premium primary">
-        <span>Lock In Profile & Map</span>
-        <i data-lucide="lock"></i>
+        <span>Continue to Insights</span>
+        <i data-lucide="arrow-right"></i>
       </button>
     </div>
   `;
@@ -1878,15 +1877,15 @@ function renderProfileLifeMap(viewWrap) {
   const canvas = viewWrap.querySelector('#life-map-canvas');
   const ctx = canvas.getContext('2d');
 
-  // Handle high DPI display
+  // Handle high DPI display for ultra-sharp canvas rendering
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = 450 * dpr;
-  canvas.height = 450 * dpr;
+  canvas.width = 500 * dpr;
+  canvas.height = 500 * dpr;
   ctx.scale(dpr, dpr);
 
-  const cx = 225;
-  const cy = 215;
-  const maxRadius = 135;
+  const cx = 250;
+  const cy = 250;
+  const maxRadius = 160;
   const dimensions = [
     { key: 'body', label: 'BODY' },
     { key: 'mind', label: 'MIND' },
@@ -1905,7 +1904,7 @@ function renderProfileLifeMap(viewWrap) {
   const startTime = performance.now();
 
   function drawRadar(progress) {
-    ctx.clearRect(0, 0, 450, 450);
+    ctx.clearRect(0, 0, 500, 500);
 
     // 1. Draw Concentric Grid Rings (Hexagons)
     const rings = 5;
@@ -1946,7 +1945,8 @@ function renderProfileLifeMap(viewWrap) {
       // Labels Text
       const dim = dimensions[i];
       const score = Math.round(scores[dim.key]);
-      const labelRadius = maxRadius + 22;
+      const styleInfo = getScoreColorStyle(score);
+      const labelRadius = maxRadius + 24;
       const labelX = cx + Math.cos(angle) * labelRadius;
       const labelY = cy + Math.sin(angle) * labelRadius;
 
@@ -1963,18 +1963,9 @@ function renderProfileLifeMap(viewWrap) {
       ctx.font = "bold 11px 'Outfit', sans-serif";
       ctx.fillText(dim.label, labelX, labelY - 7);
 
-      // Score Number
-      ctx.fillStyle = 'var(--text-muted)';
-      ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
-      
-      // Let color reflect score intensity
-      if (scores[dim.key] >= 80) {
-        ctx.fillStyle = '#06b6d4'; // Cyan for excellent
-      } else if (scores[dim.key] >= 50) {
-        ctx.fillStyle = '#8b5cf6'; // Purple for average
-      } else {
-        ctx.fillStyle = '#f43f5e'; // Rose/Red for low
-      }
+      // Score Number with dynamic conditional colors
+      ctx.fillStyle = styleInfo.hex;
+      ctx.font = "bold 12px 'Plus Jakarta Sans', sans-serif";
       ctx.fillText(`${score}/100`, labelX, labelY + 7);
     }
 
@@ -2048,86 +2039,9 @@ function renderProfileLifeMap(viewWrap) {
   // Kick off chart animation loop
   requestAnimationFrame(animateRadar);
 
-  // Form input validation and Lock-in submission logic
-  const form = viewWrap.querySelector('#profile-form');
-  const uInput = viewWrap.querySelector('#prof-username');
-  const eInput = viewWrap.querySelector('#prof-email');
-  const pInput = viewWrap.querySelector('#prof-password');
-
-  const uError = viewWrap.querySelector('#error-username');
-  const eError = viewWrap.querySelector('#error-email');
-  const pError = viewWrap.querySelector('#error-password');
-
-  // Input listeners to clear error messages in real-time
-  uInput.addEventListener('input', () => {
-    uError.classList.remove('visible');
-    uInput.style.borderColor = '';
-  });
-  eInput.addEventListener('input', () => {
-    eError.classList.remove('visible');
-    eInput.style.borderColor = '';
-  });
-  pInput.addEventListener('input', () => {
-    pError.classList.remove('visible');
-    pInput.style.borderColor = '';
-  });
-
+  // Lock-in and continue submission
   viewWrap.querySelector('#btn-lock-profile').addEventListener('click', (e) => {
     e.preventDefault();
-    let isValid = true;
-
-    // 1. Username verification
-    const username = uInput.value.trim();
-    if (!username) {
-      uError.innerText = "Username is required to label your blueprint";
-      uError.classList.add('visible');
-      uInput.style.borderColor = '#ef4444';
-      isValid = false;
-    }
-
-    // 2. Email verification
-    const email = eInput.value.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      eError.innerText = "Email is required to link your progress alerts";
-      eError.classList.add('visible');
-      eInput.style.borderColor = '#ef4444';
-      isValid = false;
-    } else if (!emailRegex.test(email)) {
-      eError.innerText = "Please enter a mathematically correct email format";
-      eError.classList.add('visible');
-      eInput.style.borderColor = '#ef4444';
-      isValid = false;
-    }
-
-    // 3. Password verification
-    const password = pInput.value;
-    if (!password) {
-      pError.innerText = "A password is required to encrypt your session";
-      pError.classList.add('visible');
-      pInput.style.borderColor = '#ef4444';
-      isValid = false;
-    } else if (password.length < 6) {
-      pError.innerText = "Password must be at least 6 characters for local security";
-      pError.classList.add('visible');
-      pInput.style.borderColor = '#ef4444';
-      isValid = false;
-    }
-
-    if (!isValid) return;
-
-    // Save profile securely in local session and commit state
-    state.sessionData.profile = {
-      username: username,
-      email: email,
-      // For privacy demo, we store a masked reference
-      passwordMasked: '•'.repeat(password.length)
-    };
-
-    // Replace the basic info placeholder name with user's custom name!
-    if (state.sessionData.basic_info) {
-      state.sessionData.basic_info.first_name = username;
-    }
 
     // Calculate & save life map dimensions directly into the session database schema
     state.sessionData.life_map = scores;

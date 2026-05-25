@@ -2113,3 +2113,123 @@ html, body {
   max-height: 450px;
 }
 
+/* Sidebar list for dynamic life map dimensions */
+.lifemap-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.lifemap-dimension-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.lifemap-dimension-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(4px);
+}
+
+.lifemap-dim-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lifemap-dim-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.lifemap-dim-icon-box i {
+  width: 20px;
+  height: 20px;
+}
+
+.lifemap-dim-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+
+.lifemap-dim-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-white);
+  letter-spacing: 0.5px;
+}
+
+.lifemap-dim-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.lifemap-dim-score {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: baseline;
+}
+
+.score-denominator {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 1px;
+  letter-spacing: 0;
+}
+
+/* Dynamic scoring color themes with glowing drop shadow glows */
+.score-high {
+  color: #30D158 !important;
+  text-shadow: 0 0 12px rgba(48, 209, 88, 0.4);
+}
+
+.score-mid {
+  color: #FFD60A !important;
+  text-shadow: 0 0 12px rgba(255, 214, 10, 0.45);
+}
+
+.score-low {
+  color: #FF453A !important;
+  text-shadow: 0 0 12px rgba(255, 69, 58, 0.45);
+}
+
+.centered-map-card {
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 480px;
+}
+
+.centered-map-card .map-canvas-container {
+  aspect-ratio: 1;
+}
+
+#life-map-canvas {
+  max-width: 500px;
+  max-height: 500px;
+}
+
+
