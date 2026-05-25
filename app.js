@@ -858,14 +858,14 @@ function buildDynamicQueue() {
   
   // 1. Physical Health & Fitness Flow
   if (chosen.includes('Physical Health & Fitness')) {
-    dynamicNodes.push('fitness_activity', 'fitness_gym_gate');
+    dynamicNodes.push('fitness_gym_gate');
     const gymGate = state.sessionData.flow_responses.fitness_gym_gate;
     if (gymGate === 'Yes') {
       dynamicNodes.push('fitness_gym_frequency');
     } else if (gymGate === 'No') {
       dynamicNodes.push('fitness_gym_no_psych');
     }
-    dynamicNodes.push('fitness_lifestyle', 'fitness_goal', 'fitness_obstacle');
+    dynamicNodes.push('fitness_activity', 'fitness_lifestyle', 'fitness_goal', 'fitness_obstacle');
   }
   
   // 2. Relationships & Social Life Flow
@@ -904,7 +904,6 @@ function buildDynamicQueue() {
     'reflection_progress',
     'reflection_pride',
     'identity',
-    'values_priorities',
     'daily_environment',
     'routine_confidence',
     'addictions_distractions',
