@@ -187,6 +187,39 @@ const ALL_FLOW_NODES = {
       buildDynamicQueue();
     }
   },
+
+  // CONDITIONAL ADAPTIVE BRANCH NODES
+  fitness_activity: {
+    type: 'single',
+    title: 'What is your current physical activity level?',
+    subtitle: 'This defines your structural movement baseline.',
+    options: [
+      { id: 'fit_act_sedentary', text: 'Sedentary', desc: 'Rare movement, mostly desk-bound or stationary.', icon: 'coffee' },
+      { id: 'fit_act_lightly', text: 'Lightly Active', desc: 'Occasional walks, active housework, or light chores.', icon: 'compass' },
+      { id: 'fit_act_moderately', text: 'Moderately Active', desc: '3 to 5 deliberate training sessions per week.', icon: 'activity' },
+      { id: 'fit_act_very', text: 'Very Active', desc: 'Daily rigorous athletics, sports, or high-physical occupations.', icon: 'zap' }
+    ],
+    save: (val) => {
+      state.sessionData.basic_info.activity_level = val;
+      state.sessionData.flow_responses.fitness_activity = val;
+    }
+  },
+  
+  relationship_status: {
+    type: 'single',
+    title: 'What is your current relationship focus?',
+    subtitle: 'This helps adapt Stoic communication guidelines to your context.',
+    options: [
+      { id: 'rel_stat_single', text: 'Single', desc: 'Focusing on building personal autonomy and self-sovereignty.', icon: 'user' },
+      { id: 'rel_stat_dating', text: 'In a relationship', desc: 'Navigating companionship, deep sharing, and mutual growth.', icon: 'heart' },
+      { id: 'rel_stat_married', text: 'Married', desc: 'Sustaining long-term commitment, family, and shared Stoic values.', icon: 'shield' },
+      { id: 'rel_stat_self', text: 'Focus on self', desc: 'Intentionally isolating attention to perform deep resets.', icon: 'target' }
+    ],
+    save: (val) => {
+      state.sessionData.basic_info.relationship_status = val;
+      state.sessionData.flow_responses.relationship_status = val;
+    }
+  },
   
   // 5. HEALTH & FITNESS FLOW
   fitness_lifestyle: {
@@ -783,11 +816,16 @@ function buildDynamicQueue() {
   
   // 1. Physical Health & Fitness Flow
   if (chosen.includes('Physical Health & Fitness')) {
-    dynamicNodes.push('fitness_lifestyle', 'fitness_goal', 'fitness_obstacle');
+    dynamicNodes.push('fitness_activity', 'fitness_lifestyle', 'fitness_goal', 'fitness_obstacle');
   }
   
   // 2. Relationships & Social Life Flow
-  if (chosen.includes('Relationships & Social Life') || chosen.includes('Confidence & Self-Esteem')) {
+  const hasRel = chosen.includes('Relationships & Social Life');
+  const hasConf = chosen.includes('Confidence & Self-Esteem');
+  if (hasRel || hasConf) {
+    if (hasRel) {
+      dynamicNodes.push('relationship_status');
+    }
     dynamicNodes.push('relationships_target', 'relationships_challenge');
   }
   
@@ -1248,32 +1286,9 @@ function renderBasicInfoForm(viewWrap) {
           <option value="Other" ${info.occupation === 'Other' ? 'selected' : ''}>Other / Transitional</option>
         </select>
       </div>
-
-      <!-- Relationship Status -->
-      <div class="form-group full-width">
-        <label class="form-label">Relationship Focus</label>
-        <div class="select-grid" id="grid-relationship">
-          <div class="selector-option ${info.relationship_status === 'Single' ? 'selected' : ''}" data-val="Single">Single</div>
-          <div class="selector-option ${info.relationship_status === 'In a relationship' ? 'selected' : ''}" data-val="In a relationship">Dating</div>
-          <div class="selector-option ${info.relationship_status === 'Married' ? 'selected' : ''}" data-val="Married">Married</div>
-          <div class="selector-option ${info.relationship_status === 'Focus on self' ? 'selected' : ''}" data-val="Focus on self">Focus on self</div>
-        </div>
-      </div>
-      
-      <!-- Fitness Activity -->
-      <div class="form-group full-width">
-        <label class="form-label" for="sel-activity">Current Fitness Activity Level</label>
-        <select id="sel-activity" class="input-premium" style="background-color: #0b0f19;">
-          <option value="" disabled ${!info.activity_level ? 'selected' : ''}>Select Activity Baseline</option>
-          <option value="Sedentary" ${info.activity_level === 'Sedentary' ? 'selected' : ''}>Sedentary (Rare movement)</option>
-          <option value="Lightly Active" ${info.activity_level === 'Lightly Active' ? 'selected' : ''}>Lightly Active (Occasional walks)</option>
-          <option value="Moderately Active" ${info.activity_level === 'Moderately Active' ? 'selected' : ''}>Moderately Active (3x training/wk)</option>
-          <option value="Very Active" ${info.activity_level === 'Very Active' ? 'selected' : ''}>Very Active (Daily rigorous athletics)</option>
-        </select>
-      </div>
     </form>
     
-    <div class="action-bar" style="margin-top: 16px;">
+    <div class="action-bar" style="margin-top: 24px;">
       <button id="btn-submit-info" class="btn-premium primary">
         <span>Continue</span>
         <i data-lucide="arrow-right"></i>
@@ -1294,7 +1309,6 @@ function renderBasicInfoForm(viewWrap) {
   };
   
   setupSegmented('grid-gender', 'gender');
-  setupSegmented('grid-relationship', 'relationship_status');
   
   // Form submission validations
   viewWrap.querySelector('#btn-submit-info').addEventListener('click', () => {
@@ -1302,7 +1316,6 @@ function renderBasicInfoForm(viewWrap) {
     const ageInp = viewWrap.querySelector('#inp-age');
     const countrySel = viewWrap.querySelector('#sel-country');
     const occupSel = viewWrap.querySelector('#sel-occupation');
-    const activeSel = viewWrap.querySelector('#sel-activity');
     
     // Quick interactive validation triggers
     if (!nameInp.value.trim()) {
@@ -1325,21 +1338,12 @@ function renderBasicInfoForm(viewWrap) {
       highlightError(occupSel);
       return;
     }
-    if (!info.relationship_status) {
-      highlightError(viewWrap.querySelector('#grid-relationship'));
-      return;
-    }
-    if (!activeSel.value) {
-      highlightError(activeSel);
-      return;
-    }
     
     // Compile and advance
     info.first_name = nameInp.value.trim();
     info.age = parseInt(ageInp.value);
     info.country = countrySel.value;
     info.occupation = occupSel.value;
-    info.activity_level = activeSel.value;
     
     advanceStep();
   });
@@ -1356,7 +1360,7 @@ function highlightError(element) {
 
 function validateBasicInfoForm() {
   const info = state.sessionData.basic_info;
-  return info.first_name && info.age && info.gender && info.country && info.occupation && info.relationship_status && info.activity_level;
+  return info.first_name && info.age && info.gender && info.country && info.occupation;
 }
 
 // SCREEN: Interactive 1-10 Routine Confidence Slider Scale
@@ -1790,8 +1794,9 @@ function calculateLifeMapMetrics() {
 
   // CONNECTION calculation (Base 35, Max 100)
   let connection = 35;
-  if (info.relationship_status === 'in_relationship') connection += 20;
-  else if (info.relationship_status === 'focus_on_self') connection += 12;
+  const relStat = (info.relationship_status || '').toLowerCase();
+  if (relStat === 'in_relationship' || relStat === 'in a relationship') connection += 20;
+  else if (relStat === 'focus_on_self' || relStat === 'focus on self') connection += 12;
   else connection += 15;
 
   const relTargets = flow.relationships_target || [];
