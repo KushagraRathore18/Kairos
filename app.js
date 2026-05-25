@@ -225,7 +225,7 @@ const ALL_FLOW_NODES = {
   fitness_gym_gate: {
     type: 'single',
     title: 'Do you go to the gym?',
-    subtitle: 'This calibrates the exact physical space of your training routines.',
+    subtitle: '',
     options: [
       { id: 'fit_gym_yes', text: 'Yes', desc: 'I have access to a commercial gym or dedicated training facility.', icon: 'check-circle' },
       { id: 'fit_gym_no', text: 'No', desc: 'I am currently inactive or not engaged in structured workouts.', icon: 'x-circle' },
@@ -240,7 +240,7 @@ const ALL_FLOW_NODES = {
   fitness_gym_frequency: {
     type: 'single',
     title: 'How frequently do you go to the gym?',
-    subtitle: 'Consistency defines momentum. Select your weekly commitment level.',
+    subtitle: '',
     options: [
       { id: 'fit_freq_1_2', text: '1-2 days / week', desc: 'Maintenance volume or starting routine.', icon: 'calendar' },
       { id: 'fit_freq_3_4', text: '3-4 days / week', desc: 'Active momentum, typical for strength or hypertrophic routines.', icon: 'activity' },
@@ -296,7 +296,7 @@ const ALL_FLOW_NODES = {
   fitness_lifestyle: {
     type: 'single',
     title: 'What best describes your current fitness lifestyle?',
-    subtitle: 'No shame. Every journey starts exactly where you are.',
+    subtitle: '',
     options: [
       { id: 'fit_gym_consistent', text: 'I go to the gym consistently', desc: 'Active routine established, looking for optimization.', icon: 'check-circle' },
       { id: 'fit_workout_occasion', text: 'I work out occasionally', desc: 'Some movement, but lacks a strict scheduling structure.', icon: 'award' },
@@ -309,7 +309,7 @@ const ALL_FLOW_NODES = {
   fitness_goal: {
     type: 'single',
     title: 'What is your primary fitness goal?',
-    subtitle: 'This centers your workout roadmap objectives.',
+    subtitle: '',
     options: [
       { id: 'fit_goal_lose_weight', text: 'Lose weight', desc: 'Fat loss, healthy conditioning, and body definition.', icon: 'flame' },
       { id: 'fit_goal_build_muscle', text: 'Build muscle', desc: 'Strength enlargement, athletic volume, and resistance.', icon: 'dumbbell' },
@@ -323,7 +323,7 @@ const ALL_FLOW_NODES = {
   fitness_obstacle: {
     type: 'single',
     title: 'What usually stops you from reaching your fitness goals?',
-    subtitle: 'Pinpointing the friction allows us to neutralize it.',
+    subtitle: '',
     options: [
       { id: 'fit_obs_motivation', text: 'Lack of motivation', desc: 'Relying on emotional spikes rather than systematic habits.', icon: 'help-circle' },
       { id: 'fit_obs_inconsistent', text: 'Inconsistent routine', desc: 'Life interrupts schedule, and training falls off quickly.', icon: 'calendar' },
@@ -341,7 +341,7 @@ const ALL_FLOW_NODES = {
   relationships_target: {
     type: 'multiple',
     title: 'Which relationships would you like to improve?',
-    subtitle: 'Select the focus areas of your social ecosystem.',
+    subtitle: '',
     options: [
       { id: 'rel_target_parents', text: 'Parents & Family', desc: 'Deepening ancestral connections or healing boundaries.', icon: 'home' },
       { id: 'rel_target_friends', text: 'Friendships', desc: 'Attracting high-value peers or restoring old bonds.', icon: 'users' },
@@ -354,7 +354,7 @@ const ALL_FLOW_NODES = {
   relationships_challenge: {
     type: 'single',
     title: 'What challenges are affecting your relationships most?',
-    subtitle: 'Identifying the emotional barrier triggers growth.',
+    subtitle: '',
     options: [
       { id: 'rel_chal_loneliness', text: 'Loneliness', desc: 'Surrounded by people but lacking meaningful connection.', icon: 'user-minus' },
       { id: 'rel_chal_overthinking', text: 'Overthinking', desc: 'Analyzing texts, cues, and micro-expressions exhaustively.', icon: 'brain' },
@@ -373,7 +373,7 @@ const ALL_FLOW_NODES = {
   education_state: {
     type: 'single',
     title: 'What best describes your current situation?',
-    subtitle: 'Find your focus baseline.',
+    subtitle: '',
     options: [
       { id: 'edu_focus_struggle', text: 'I struggle to stay focused', desc: 'Short attention span, constantly shifting between tabs.', icon: 'alert-triangle' },
       { id: 'edu_procrastinate', text: 'I procrastinate a lot', desc: 'Delaying high-impact tasks until the absolute last minute.', icon: 'clock' },
@@ -387,7 +387,7 @@ const ALL_FLOW_NODES = {
   education_distraction: {
     type: 'single',
     title: 'What distracts you the most?',
-    subtitle: 'Neutralizing focus leaks is step one to hyper-productivity.',
+    subtitle: '',
     options: [
       { id: 'edu_dist_social', text: 'Social media', desc: 'Endless doomscrolling, notification tracking, and feed updates.', icon: 'smartphone' },
       { id: 'edu_dist_overthinking', text: 'Overthinking', desc: 'Internal narratives and future anxiety paralyzing action.', icon: 'brain' },
@@ -405,7 +405,7 @@ const ALL_FLOW_NODES = {
   discipline_state: {
     type: 'single',
     title: 'What feels most true about you right now?',
-    subtitle: 'Your relationship with consistency dictates your future.',
+    subtitle: '',
     options: [
       { id: 'disc_state_basic_habits', text: 'I struggle with even basic habits', desc: 'Struggling with waking up, cleaning, hydration, or reading.', icon: 'frown' },
       { id: 'disc_state_few_days', text: 'I can stay consistent for a few days only', desc: 'The typical 3-day motivational burst followed by collapse.', icon: 'rotate-cw' },
@@ -418,7 +418,7 @@ const ALL_FLOW_NODES = {
   discipline_motivation: {
     type: 'single',
     title: 'What motivates you the most?',
-    subtitle: 'Your deepest drive is the fuel for your dark days.',
+    subtitle: '',
     options: [
       { id: 'disc_mot_progress', text: 'Seeing visible progress', desc: 'Data logs, physical changes, and system metrics.', icon: 'bar-chart-2' },
       { id: 'disc_mot_stronger', text: 'Becoming mentally stronger', desc: 'Building resilience, stoicism, and emotional sovereignty.', icon: 'activity' },
@@ -487,7 +487,7 @@ const ALL_FLOW_NODES = {
   routine: {
     type: 'single',
     title: 'How predictable are your days?',
-    subtitle: 'Structure is the container of high performance.',
+    subtitle: '',
     options: [
       { id: 'rout_extremely', text: 'Extremely structured', desc: 'Time-blocked hours, exact wake/sleep schedules.', icon: 'calendar' },
       { id: 'rout_somewhat', text: 'Somewhat organized', desc: 'Loose morning routines, basic calendar checkmarks.', icon: 'check-square' },
@@ -601,7 +601,7 @@ const ALL_FLOW_NODES = {
   addictions_distractions: {
     type: 'multiple',
     title: 'Are there any habits or addictions currently holding you back?',
-    subtitle: 'Select all that apply. Admitting is the first step to liberation.',
+    subtitle: '',
     options: [
       { id: 'add_social', text: 'Social media addiction', desc: 'Doomscrolling feeds and checking notification loops.', icon: 'smartphone' },
       { id: 'add_gaming', text: 'Gaming addiction', desc: 'Chasing virtual points instead of real-world accomplishments.', icon: 'gamepad-2' },
@@ -623,7 +623,7 @@ const ALL_FLOW_NODES = {
   challenge_intensity: {
     type: 'single',
     title: 'How would you like this journey to challenge you?',
-    subtitle: 'Calibrate the friction. High friction builds hard steel.',
+    subtitle: '',
     options: [
       { id: 'int_gentle', text: 'Gentle & Supportive', desc: '“I want slow, sustainable progress without pressure.”', icon: 'heart' },
       { id: 'int_balanced', text: 'Balanced Growth', desc: '“Push me enough to grow while keeping things manageable.”', icon: 'trending-up' },
@@ -637,7 +637,7 @@ const ALL_FLOW_NODES = {
   personality_energy: {
     type: 'single',
     title: 'Which description feels closest to your current energy?',
-    subtitle: 'This defines your active state of action.',
+    subtitle: '',
     options: [
       { id: 'eng_calm', text: 'Calm but unmotivated', desc: 'Stable resting state, but lacking the fire of motivation.', icon: 'coffee' },
       { id: 'eng_ambitious', text: 'Ambitious but inconsistent', desc: 'High aspirations, but struggle with daily execution.', icon: 'trending-up' },
@@ -1191,22 +1191,26 @@ function renderStandardOptionCard(viewWrap) {
     cards.forEach(card => {
       card.addEventListener('click', () => {
         const val = card.getAttribute('data-value');
-        
-        if (val === 'None of these') {
-          // If none of these is clicked, clear all other selections and select only none
-          chosenArray = ['None of these'];
-          cards.forEach(c => {
-            if (c.getAttribute('data-value') !== 'None of these') {
-              c.classList.remove('selected');
-            }
-          });
-          card.classList.add('selected');
+        const NONE_VAL = 'None of these';
+
+        if (val === NONE_VAL) {
+          // Toggle "None of these" — if already selected, deselect it
+          if (chosenArray.includes(NONE_VAL)) {
+            chosenArray = [];
+            card.classList.remove('selected');
+          } else {
+            // Select only "None of these", clear everything else
+            chosenArray = [NONE_VAL];
+            cards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+          }
         } else {
-          // If a standard item is clicked, deselect 'None of these' if it was selected
-          chosenArray = chosenArray.filter(v => v !== 'None of these');
-          const noneCard = Array.from(cards).find(c => c.getAttribute('data-value') === 'None of these');
+          // Regular item — always deselect "None of these" first
+          chosenArray = chosenArray.filter(v => v !== NONE_VAL);
+          const noneCard = Array.from(cards).find(c => c.getAttribute('data-value') === NONE_VAL);
           if (noneCard) noneCard.classList.remove('selected');
-          
+
+          // Toggle this item
           if (chosenArray.includes(val)) {
             chosenArray = chosenArray.filter(v => v !== val);
             card.classList.remove('selected');
@@ -1215,12 +1219,8 @@ function renderStandardOptionCard(viewWrap) {
             card.classList.add('selected');
           }
         }
-        
-        if (chosenArray.length > 0) {
-          continueBtn.removeAttribute('disabled');
-        } else {
-          continueBtn.setAttribute('disabled', 'true');
-        }
+
+        continueBtn.toggleAttribute('disabled', chosenArray.length === 0);
       });
     });
     
@@ -1457,7 +1457,38 @@ function validateBasicInfoForm() {
 }
 
 // SCREEN: Interactive 1-10 Routine Confidence Slider Scale
+// Dynamically repaints the slider filled-track and thumb glow based on zone
+function updateSliderTrack(sliderEl) {
+  const val = parseInt(sliderEl.value);
+  const pct = ((val - 1) / 9) * 100; // 1-10 mapped to 0-100%
+
+  let fillColor, glowColor, thumbGlow;
+  if (val <= 3) {
+    // Low zone — warm red/amber
+    fillColor = `linear-gradient(to right, #ef4444 0%, #f97316 ${pct}%, rgba(255,255,255,0.08) ${pct}%)`;
+    glowColor = 'rgba(239, 68, 68, 0.55)';
+    thumbGlow = '0 0 18px rgba(239, 68, 68, 0.9), 0 0 6px rgba(249, 115, 22, 0.6)';
+  } else if (val <= 7) {
+    // Mid zone — brand blue/purple
+    fillColor = `linear-gradient(to right, #6366f1 0%, #8b5cf6 ${pct}%, rgba(255,255,255,0.08) ${pct}%)`;
+    glowColor = 'rgba(99, 102, 241, 0.55)';
+    thumbGlow = '0 0 18px rgba(99, 102, 241, 0.9), 0 0 6px rgba(139, 92, 246, 0.6)';
+  } else {
+    // High zone — neon violet/purple
+    fillColor = `linear-gradient(to right, #7c3aed 0%, #a855f7 ${pct}%, #e879f9 ${pct * 0.98}%, rgba(255,255,255,0.08) ${pct}%)`;
+    glowColor = 'rgba(168, 85, 247, 0.7)';
+    thumbGlow = '0 0 22px rgba(168, 85, 247, 1), 0 0 8px rgba(232, 121, 249, 0.8)';
+  }
+
+  sliderEl.style.background = fillColor;
+  // Apply thumb glow via CSS variable read by the pseudo-element shimmer
+  sliderEl.style.setProperty('--thumb-glow', thumbGlow);
+  // Update the track box-shadow to cast ambient glow
+  sliderEl.style.boxShadow = `0 2px 12px -2px ${glowColor}`;
+}
+
 function renderRoutineConfidence(viewWrap) {
+
   const prevVal = state.sessionData.general_responses.routine_confidence || 5;
   
   viewWrap.innerHTML = `
@@ -1562,9 +1593,11 @@ function renderRoutineConfidence(viewWrap) {
   
   // Initialize
   updateFeedback(parseInt(slider.value));
-  
+  updateSliderTrack(slider);
+
   slider.addEventListener('input', (e) => {
     updateFeedback(parseInt(e.target.value));
+    updateSliderTrack(e.target);
   });
   
   viewWrap.querySelector('#btn-submit-slider').addEventListener('click', () => {
