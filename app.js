@@ -450,6 +450,147 @@ const ALL_FLOW_NODES = {
     save: (val) => { state.sessionData.general_responses.identity = val; }
   },
   
+  // NEW PAGE — VALUES & PRIORITIES
+  values_priorities: {
+    type: 'multiple',
+    title: 'What matters most to you right now?',
+    subtitle: 'Select everything that resonates. This aligns your core drivers.',
+    options: [
+      { id: 'val_phys_health', text: 'Physical Health & Energy', desc: 'Optimizing body vitality, sleep cycles, and daily strength.', icon: 'activity' },
+      { id: 'val_inner_peace', text: 'Inner Peace & Mental Calm', desc: 'Mindfulness practice, anxiety reduction, and mental silence.', icon: 'heart' },
+      { id: 'val_success', text: 'Success & Achievement', desc: 'Reaching career goals, professional heights, and milestones.', icon: 'award' },
+      { id: 'val_finance', text: 'Financial Freedom', desc: 'Sovereignty over money, investing, and asset building.', icon: 'dollar-sign' },
+      { id: 'val_purpose', text: 'Purpose & Direction', desc: 'Finding your calling and living in complete alignment.', icon: 'compass' },
+      { id: 'val_discipline', text: 'Discipline & Self-Control', desc: 'Building habits, killing procrastination, and consistency.', icon: 'lock' },
+      { id: 'val_relationships', text: 'Deep Relationships', desc: 'Attracting noble peers, restoring family bonds, or dating.', icon: 'users' },
+      { id: 'val_confidence', text: 'Confidence & Self-Respect', desc: 'Standing tall, conquering imposter loops, and speaking up.', icon: 'smile' },
+      { id: 'val_happiness', text: 'Happiness & Enjoyment', desc: 'Prioritizing daily joy, laughter, and appreciation.', icon: 'sun' },
+      { id: 'val_growth', text: 'Personal Growth', desc: 'Constant learning, book routines, and skill acquisition.', icon: 'trending-up' },
+      { id: 'val_spiritual', text: 'Spiritual Balance', desc: 'Quiet reflection, inner connection, and meditation.', icon: 'wind' },
+      { id: 'val_freedom', text: 'Freedom & Independence', desc: 'Designing your schedule and deciding your direction.', icon: 'shield' },
+      { id: 'val_best_version', text: 'Becoming the Best Version of Myself', desc: 'The absolute commitment to self-actualization and victory.', icon: 'sparkles' }
+    ],
+    save: (vals) => { state.sessionData.general_responses.values_priorities = vals; }
+  },
+
+  // NEW PAGE — DAILY ENVIRONMENT
+  daily_environment: {
+    type: 'multiple',
+    title: 'Where do you spend most of your time?',
+    subtitle: 'Select all that apply. Your surroundings shape your habits.',
+    options: [
+      { id: 'env_home', text: 'At home with family', desc: 'Cozy spaces, domestic dynamics, and shared routines.', icon: 'home' },
+      { id: 'env_alone', text: 'Mostly alone', desc: 'Solitary focus, quiet contemplation, or lonely plateaus.', icon: 'user' },
+      { id: 'env_school', text: 'At school or college', desc: 'Study halls, lecture blocks, exams, and campus life.', icon: 'book-open' },
+      { id: 'env_work', text: 'At work', desc: 'Office desks, virtual meetings, or manual work sites.', icon: 'briefcase' },
+      { id: 'env_gym', text: 'In the gym', desc: 'Iron grinds, athletic circles, and physical tracking.', icon: 'dumbbell' },
+      { id: 'env_online', text: 'Online or on social media', desc: 'Feeds, digital spaces, virtual communities.', icon: 'smartphone' },
+      { id: 'env_friends', text: 'With friends', desc: 'Socializing, group hangouts, active shared time.', icon: 'users' },
+      { id: 'env_outside', text: 'Outside/traveling', desc: 'Under the sky, exploring trails, or commuting often.', icon: 'map' },
+      { id: 'env_gaming', text: 'Gaming or entertainment spaces', desc: 'Chasing digital goals, streaming, and relaxing.', icon: 'gamepad-2' },
+      { id: 'env_public', text: 'Busy public environments', desc: 'Coffee shops, public transit, packed cities.', icon: 'map-pin' },
+      { id: 'env_quiet', text: 'Quiet personal spaces', desc: 'My room, personal sanctuary, distraction-free zones.', icon: 'coffee' }
+    ],
+    save: (vals) => { state.sessionData.general_responses.daily_environment = vals; }
+  },
+
+  // NEW PAGE — ROUTINE CONFIDENCE SCALE
+  routine_confidence: {
+    type: 'custom',
+    render: renderRoutineConfidence
+  },
+
+  // NEW PAGE — ADDICTIONS & DISTRACTIONS
+  addictions_distractions: {
+    type: 'multiple',
+    title: 'Are there any habits or addictions currently holding you back?',
+    subtitle: 'Select all that apply. Admitting is the first step to liberation.',
+    options: [
+      { id: 'add_social', text: 'Social media addiction', desc: 'Doomscrolling feeds and checking notification loops.', icon: 'smartphone' },
+      { id: 'add_gaming', text: 'Gaming addiction', desc: 'Chasing virtual points instead of real-world accomplishments.', icon: 'gamepad-2' },
+      { id: 'add_smoking', text: 'Smoking', desc: 'Nicotine reliance, smoke breaks, or vape use.', icon: 'wind' },
+      { id: 'add_alcohol', text: 'Alcohol', desc: 'Frequent drinking, social reliance, or evening resets.', icon: 'wine' },
+      { id: 'add_overeating', text: 'Overeating', desc: 'Sugar cravings, late-night junk, or stress-eating loops.', icon: 'activity' },
+      { id: 'add_porn', text: 'Adult content/pornography', desc: 'Short-term dopamine hits depleting baseline drive.', icon: 'eye-off' },
+      { id: 'add_procrastination', text: 'Constant procrastination', desc: 'Putting off hard things, resulting in panic cycles.', icon: 'clock' },
+      { id: 'add_phone', text: 'Phone addiction', desc: 'Checking notifications every 5 minutes automatically.', icon: 'smartphone' },
+      { id: 'add_scrolling', text: 'Late-night scrolling', desc: 'Doomscrolling in bed, destroying next-day energy.', icon: 'moon' },
+      { id: 'add_overthinking', text: 'Overthinking', desc: 'Endless scenarios, analysis paralysis, and mind static.', icon: 'brain' },
+      { id: 'add_negative_talk', text: 'Negative self-talk', desc: 'Imposter syndrome, low self-belief, and internal criticism.', icon: 'frown' },
+      { id: 'add_none', text: 'None of these', desc: 'I am completely free of destructive habit loops right now.', icon: 'check-circle' }
+    ],
+    save: (vals) => { state.sessionData.general_responses.addictions_distractions = vals; }
+  },
+
+  // NEW PAGE — CHALLENGE INTENSITY
+  challenge_intensity: {
+    type: 'single',
+    title: 'How would you like this journey to challenge you?',
+    subtitle: 'Calibrate the friction. High friction builds hard steel.',
+    options: [
+      { id: 'int_gentle', text: 'Gentle & Supportive', desc: '“I want slow, sustainable progress without pressure.”', icon: 'heart' },
+      { id: 'int_balanced', text: 'Balanced Growth', desc: '“Push me enough to grow while keeping things manageable.”', icon: 'trending-up' },
+      { id: 'int_serious', text: 'Serious Transformation', desc: '“I want strong accountability and real discipline.”', icon: 'shield' },
+      { id: 'int_elite', text: 'Elite Challenge Mode', desc: '“Push me hard. I want maximum growth and intensity.”', icon: 'zap' }
+    ],
+    save: (val) => { state.sessionData.general_responses.challenge_intensity = val; }
+  },
+
+  // NEW PAGE — PERSONALITY & ENERGY STYLE
+  personality_energy: {
+    type: 'single',
+    title: 'Which description feels closest to your current energy?',
+    subtitle: 'This defines your active state of action.',
+    options: [
+      { id: 'eng_calm', text: 'Calm but unmotivated', desc: 'Stable resting state, but lacking the fire of motivation.', icon: 'coffee' },
+      { id: 'eng_ambitious', text: 'Ambitious but inconsistent', desc: 'High aspirations, but struggle with daily execution.', icon: 'trending-up' },
+      { id: 'eng_exhausted', text: 'Mentally exhausted', desc: 'Feeling drained, burnt out, and needing steady recovery.', icon: 'battery-low' },
+      { id: 'eng_lost', text: 'Lost and directionless', desc: 'Ready to work, but searching for a clear, meaningful path.', icon: 'compass' },
+      { id: 'eng_quiet', text: 'Quietly determined', desc: 'Steady focus, working in silence towards specific benchmarks.', icon: 'shield' },
+      { id: 'eng_driven', text: 'Highly driven but overwhelmed', desc: 'Fast execution, but dealing with high cognitive load.', icon: 'zap' },
+      { id: 'eng_focused', text: 'Disciplined and focused', desc: 'Strong habits, seeking peak optimization and mastery.', icon: 'lock' },
+      { id: 'eng_rebuilding', text: 'Rebuilding myself slowly', desc: 'Healing systems, taking step-by-step progress metrics.', icon: 'rotate-cw' },
+      { id: 'eng_transform', text: 'Ready for a complete transformation', desc: 'The ultimate pivot point. Fully locked in for reinvention.', icon: 'sparkles' }
+    ],
+    save: (val) => { state.sessionData.general_responses.personality_energy = val; }
+  },
+
+  // NEW PAGE — FUTURE SELF VISION
+  future_self_vision: {
+    type: 'multiple',
+    title: 'If everything improved in the next year, what would change the most?',
+    subtitle: 'Select everything that applies. Vision anchors consistency.',
+    options: [
+      { id: 'vis_body', text: 'My body and health', desc: 'Gaining athletic shape, clean power, and longevity.', icon: 'activity' },
+      { id: 'vis_confidence', text: 'My confidence', desc: 'Standing tall, speaking with voice, killing self-doubt.', icon: 'smile' },
+      { id: 'vis_discipline', text: 'My discipline', desc: 'Owning my habits, showing up daily without resistance.', icon: 'lock' },
+      { id: 'vis_relationships', text: 'My relationships', desc: 'Surrounding myself with values-aligned peers and partners.', icon: 'users' },
+      { id: 'vis_happiness', text: 'My happiness', desc: 'Enjoying daily moments, feeling full appreciation.', icon: 'sun' },
+      { id: 'vis_finances', text: 'My finances/career', desc: 'Multiplying professional metrics and capital scaling.', icon: 'dollar-sign' },
+      { id: 'vis_mindset', text: 'My mindset', desc: 'Mastering attention, Stoicism, and emotional sovereignty.', icon: 'brain' },
+      { id: 'vis_productivity', text: 'My productivity', desc: 'Maximizing high-impact outputs and flow states.', icon: 'zap' },
+      { id: 'vis_peace', text: 'My peace of mind', desc: 'Silencing overthinking and daily anxiety vectors.', icon: 'wind' },
+      { id: 'vis_purpose', text: 'My purpose in life', desc: 'Connecting daily effort to a clear, ultimate calling.', icon: 'target' }
+    ],
+    save: (vals) => { state.sessionData.general_responses.future_self_vision = vals; }
+  },
+
+  // NEW PAGE — FINAL MINDSET CHECK
+  final_mindset: {
+    type: 'single',
+    title: 'What kind of life are you trying to build?',
+    subtitle: 'This defines your ultimate blueprint target.',
+    options: [
+      { id: 'mnd_peace', text: 'A peaceful and balanced life', desc: 'Prioritizing rest, mindfulness, clean routines, and calm.', icon: 'wind' },
+      { id: 'mnd_success', text: 'A disciplined and successful life', desc: 'Reaching professional peaks, building financial security.', icon: 'shield' },
+      { id: 'mnd_confident', text: 'A confident and respected life', desc: 'Standing tall in the community, building strong boundaries.', icon: 'users' },
+      { id: 'mnd_healthy', text: 'A healthy and energetic life', desc: 'Fueling my biology, waking up with power and athletic vigor.', icon: 'activity' },
+      { id: 'mnd_meaning', text: 'A meaningful and purposeful life', desc: 'Connecting my career, relationships, and actions to a calling.', icon: 'target' },
+      { id: 'mnd_transform', text: 'A complete personal transformation', desc: 'Rebuilding body, mind, habits, and career from the ground up.', icon: 'sparkles' }
+    ],
+    save: (val) => { state.sessionData.general_responses.final_mindset = val; }
+  },
+  
   // 14. FINAL ROADMAP ONBOARDING COMPLETE (Universal)
   final_roadmap: {
     type: 'custom',
@@ -635,7 +776,21 @@ function buildDynamicQueue() {
   }
   
   // Core universal pages to chain at the end
-  const universalEndNodes = ['routine', 'reflection_progress', 'reflection_pride', 'identity', 'final_roadmap'];
+  const universalEndNodes = [
+    'routine',
+    'reflection_progress',
+    'reflection_pride',
+    'identity',
+    'values_priorities',
+    'daily_environment',
+    'routine_confidence',
+    'addictions_distractions',
+    'challenge_intensity',
+    'personality_energy',
+    'future_self_vision',
+    'final_mindset',
+    'final_roadmap'
+  ];
   
   // Re-build active queue: Base initial queue + dynamic selections + ending pages
   state.activeQueue = [
@@ -770,6 +925,7 @@ function renderStandardOptionCard(viewWrap) {
     // then focus_areas array, then default to empty array.
     const topLevel = state.sessionData[nodeKey];
     selectedVal = state.sessionData.flow_responses[nodeKey]
+               || state.sessionData.general_responses[nodeKey]
                || (Array.isArray(topLevel) ? topLevel : null)
                || [];
   } else {
@@ -787,8 +943,18 @@ function renderStandardOptionCard(viewWrap) {
     <div class="${isMultiple ? 'cards-grid' : 'cards-layout'}">
       ${state.activeNode.options.map(opt => {
         const isSel = isMultiple ? selectedVal.includes(opt.text) : selectedVal === opt.text;
+        
+        // Custom dynamic classing based on Challenge Intensity selections
+        let intensityGlow = '';
+        if (nodeKey === 'challenge_intensity') {
+          if (opt.text.includes('Gentle')) intensityGlow = 'intensity-gentle';
+          else if (opt.text.includes('Balanced')) intensityGlow = 'intensity-balanced';
+          else if (opt.text.includes('Serious')) intensityGlow = 'intensity-serious';
+          else if (opt.text.includes('Elite')) intensityGlow = 'intensity-elite';
+        }
+        
         return `
-          <div class="glow-card ${isSel ? 'selected' : ''}" data-value="${opt.text}">
+          <div class="glow-card ${isSel ? 'selected' : ''} ${intensityGlow}" data-value="${opt.text}">
             <div class="card-icon-box">
               <i data-lucide="${opt.icon}"></i>
             </div>
@@ -827,12 +993,29 @@ function renderStandardOptionCard(viewWrap) {
     cards.forEach(card => {
       card.addEventListener('click', () => {
         const val = card.getAttribute('data-value');
-        if (chosenArray.includes(val)) {
-          chosenArray = chosenArray.filter(v => v !== val);
-          card.classList.remove('selected');
-        } else {
-          chosenArray.push(val);
+        
+        if (val === 'None of these') {
+          // If none of these is clicked, clear all other selections and select only none
+          chosenArray = ['None of these'];
+          cards.forEach(c => {
+            if (c.getAttribute('data-value') !== 'None of these') {
+              c.classList.remove('selected');
+            }
+          });
           card.classList.add('selected');
+        } else {
+          // If a standard item is clicked, deselect 'None of these' if it was selected
+          chosenArray = chosenArray.filter(v => v !== 'None of these');
+          const noneCard = Array.from(cards).find(c => c.getAttribute('data-value') === 'None of these');
+          if (noneCard) noneCard.classList.remove('selected');
+          
+          if (chosenArray.includes(val)) {
+            chosenArray = chosenArray.filter(v => v !== val);
+            card.classList.remove('selected');
+          } else {
+            chosenArray.push(val);
+            card.classList.add('selected');
+          }
         }
         
         if (chosenArray.length > 0) {
@@ -1105,6 +1288,123 @@ function validateBasicInfoForm() {
   return info.first_name && info.age && info.gender && info.country && info.occupation && info.relationship_status && info.activity_level;
 }
 
+// SCREEN: Interactive 1-10 Routine Confidence Slider Scale
+function renderRoutineConfidence(viewWrap) {
+  const prevVal = state.sessionData.general_responses.routine_confidence || 5;
+  
+  viewWrap.innerHTML = `
+    <div class="question-header">
+      <span class="question-pre">Self-Trust Metric</span>
+      <h2 class="question-title">How confident are you that you can stick to a routine for 7 days?</h2>
+      <p class="question-desc">Be completely honest with yourself. This calibrates habit volume.</p>
+    </div>
+    
+    <div class="slider-container-box">
+      <!-- Big Circle Value Indicator -->
+      <div class="slider-glow-value" id="slider-glow-val">${prevVal}</div>
+      
+      <!-- Range Slider -->
+      <div class="slider-input-wrapper">
+        <input type="range" id="routine-slider" min="1" max="10" step="1" value="${prevVal}" class="premium-range-slider">
+        <div class="slider-ticks">
+          ${Array.from({length: 10}, (_, i) => `<span class="tick-label">${i+1}</span>`).join('')}
+        </div>
+      </div>
+      
+      <!-- Live Dynamic Feedback Box -->
+      <div class="feedback-card glow-card" id="feedback-card-box">
+        <div class="feedback-icon-box" id="feedback-icon">
+          <i data-lucide="compass"></i>
+        </div>
+        <div class="feedback-content">
+          <span class="feedback-tier" id="feedback-tier">Level 5 Confidence</span>
+          <p class="feedback-text" id="feedback-txt">I can stay disciplined sometimes.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-bar">
+      <button id="btn-submit-slider" class="btn-premium primary">
+        <span>Continue</span>
+        <i data-lucide="arrow-right"></i>
+      </button>
+    </div>
+  `;
+  
+  const slider = viewWrap.querySelector('#routine-slider');
+  const glowVal = viewWrap.querySelector('#slider-glow-val');
+  const feedbackCard = viewWrap.querySelector('#feedback-card-box');
+  const feedbackTier = viewWrap.querySelector('#feedback-tier');
+  const feedbackTxt = viewWrap.querySelector('#feedback-txt');
+  const feedbackIcon = viewWrap.querySelector('#feedback-icon');
+  
+  const getFeedbackData = (val) => {
+    if (val <= 3) {
+      return {
+        tier: "Developing Consistency",
+        text: "“I struggle with consistency right now.”",
+        icon: "battery-low",
+        color: "rgba(239, 68, 68, 0.12)", // red
+        glow: "0 0 20px rgba(239, 68, 68, 0.25)"
+      };
+    } else if (val <= 6) {
+      return {
+        tier: "Moderate Consistency",
+        text: "“I can stay disciplined sometimes.”",
+        icon: "compass",
+        color: "rgba(245, 158, 11, 0.12)", // orange/amber
+        glow: "0 0 20px rgba(245, 158, 11, 0.25)"
+      };
+    } else if (val <= 8) {
+      return {
+        tier: "Strong Consistency",
+        text: "“I usually stay committed once I start.”",
+        icon: "trending-up",
+        color: "rgba(6, 182, 212, 0.12)", // cyan
+        glow: "0 0 20px rgba(6, 182, 212, 0.25)"
+      };
+    } else {
+      return {
+        tier: "Unshakable Consistency",
+        text: "“I trust myself to stay consistent.”",
+        icon: "shield",
+        color: "rgba(139, 92, 246, 0.12)", // violet/purple
+        glow: "0 0 20px rgba(139, 92, 246, 0.25)"
+      };
+    }
+  };
+  
+  const updateFeedback = (val) => {
+    const data = getFeedbackData(val);
+    glowVal.innerText = val;
+    feedbackTier.innerText = `${data.tier} (Level ${val}/10)`;
+    feedbackTxt.innerText = data.text;
+    feedbackIcon.innerHTML = `<i data-lucide="${data.icon}"></i>`;
+    lucide.createIcons();
+    
+    // Smooth color shift
+    feedbackCard.style.background = `linear-gradient(135deg, rgba(255, 255, 255, 0.05), ${data.color})`;
+    feedbackCard.style.boxShadow = data.glow;
+    feedbackCard.style.borderColor = data.color.replace('0.12', '0.4');
+    
+    // Add custom glow effect to the large numeric label
+    glowVal.style.color = 'var(--text-white)';
+    glowVal.style.textShadow = `0 0 20px ${data.color.replace('0.12', '0.6')}`;
+  };
+  
+  // Initialize
+  updateFeedback(parseInt(slider.value));
+  
+  slider.addEventListener('input', (e) => {
+    updateFeedback(parseInt(e.target.value));
+  });
+  
+  viewWrap.querySelector('#btn-submit-slider').addEventListener('click', () => {
+    state.sessionData.general_responses.routine_confidence = parseInt(slider.value);
+    advanceStep();
+  });
+}
+
 // SCREEN 14: Algorithmic Roadmap Synthesis Screen
 function renderRoadmapScreen(viewWrap) {
   // First, generate the algorithmically tailored self-improvement roadmap
@@ -1232,43 +1532,91 @@ function renderRoadmapScreen(viewWrap) {
   }, 4200); // Process loading duration
 }
 
-// Algorithmic synthesis details
 function compileAlgorithmRoadmap() {
   const info = state.sessionData.basic_info;
   const stateVal = state.sessionData.life_state;
-  const identVal = state.sessionData.general_responses.identity;
   const chosenAreas = state.sessionData.focus_areas;
   const flowAns = state.sessionData.flow_responses;
   
+  // Retrieve new onboarding parameters
+  const genAns = state.sessionData.general_responses;
+  const values = genAns.values_priorities || [];
+  const environment = genAns.daily_environment || [];
+  const confidence = genAns.routine_confidence || 5;
+  const addictions = genAns.addictions_distractions || [];
+  const challenge = genAns.challenge_intensity || 'Balanced Growth';
+  const energy = genAns.personality_energy || 'Quietly determined';
+  const vision = genAns.future_self_vision || [];
+  const mindset = genAns.final_mindset || 'A complete personal transformation';
+  const identityVal = genAns.identity || '';
+
   // 1. Archetype synthesis
   let archetype = 'The Centered Pathfinder';
-  if (stateVal.includes('improve yourself') || identVal.includes('high-performance') || identVal.includes('full potential')) {
-    archetype = 'The Sovereign Optimizer';
-  } else if (stateVal.includes('okay, but') || identVal.includes('disciplined')) {
-    archetype = 'The Dynamic Architect';
-  } else if (stateVal.includes('exhausted') || stateVal.includes('stuck') || identVal.includes('rebuild')) {
-    archetype = 'The Resilient Ascendant';
+  if (mindset.includes('complete personal transformation') || energy.includes('Ready for a complete transformation')) {
+    archetype = 'The Phoenix Ascendant';
+  } else if (mindset.includes('peaceful and balanced') || energy.includes('Mentally exhausted')) {
+    archetype = 'The Stoic Alchemist';
+  } else if (mindset.includes('disciplined and successful') || energy.includes('Disciplined and focused')) {
+    archetype = 'The Sovereign Achiever';
+  } else if (mindset.includes('healthy and energetic')) {
+    archetype = 'The Vitality Sovereign';
+  } else if (mindset.includes('meaningful and purposeful') || energy.includes('Lost and directionless')) {
+    archetype = 'The Purpose Pathfinder';
+  } else if (mindset.includes('confident and respected')) {
+    archetype = 'The Unshakable Pillar';
+  } else {
+    // Fallback
+    if (stateVal.includes('improve yourself') || identityVal.includes('high-performance') || identityVal.includes('full potential')) {
+      archetype = 'The Sovereign Optimizer';
+    } else if (stateVal.includes('okay, but') || identityVal.includes('disciplined')) {
+      archetype = 'The Dynamic Architect';
+    } else if (stateVal.includes('exhausted') || stateVal.includes('stuck') || identityVal.includes('rebuild')) {
+      archetype = 'The Resilient Ascendant';
+    }
   }
   
   // 2. Custom letter crafting
-  let letter = `Your responses indicate you are ready to undergo a profound reinvention. By targeting `;
-  if (chosenAreas.length > 0) {
-    letter += chosenAreas.slice(0, 3).join(', ') + `, we will establish structural boundaries around your day. `;
+  let letter = `Welcome to the KAIROS ascent protocol, ${info.first_name}. `;
+  
+  // Contextual drivers
+  if (values.length > 0) {
+    letter += `Your deep driving vectors are anchored in ${values.slice(0, 2).join(' and ')}. `;
   } else {
-    letter += `your key habit pillars, we will lay down structural anchors. `;
+    letter += `Your focus is set on optimizing your daily lifestyle pillars. `;
   }
   
-  if (flowAns.fitness_obstacle) {
-    letter += `We have recognized that "${flowAns.fitness_obstacle}" has stalled your momentum. We will neutralize this early in Stage I. `;
-  }
-  
-  if (flowAns.sleep_state && flowAns.sleep_state.includes('Poor')) {
-    letter += `Furthermore, prioritizing evening circadian resets will be a major catalyst to restore your focus reserves. `;
+  // Confidence & environment calibration
+  letter += `With a self-trust level of ${confidence}/10, we will calibrate your habit intensity to `;
+  if (confidence <= 3) {
+    letter += `eliminate initial friction, focusing on tiny, high-activation micro-wins. `;
+  } else if (confidence <= 6) {
+    letter += `establish consistent, mid-density daily anchors that fit cleanly around your occupation. `;
   } else {
-    letter += `Your solid foundation will allow us to immediately launch advanced focus blocks. `;
+    letter += `immediately stack advanced high-performance protocols. `;
   }
-  
-  letter += `Welcome to the KAIROS ascent protocol. Take the first step.`;
+
+  // Environment and distractions obstacles
+  if (addictions.length > 0 && !addictions.includes('None of these')) {
+    letter += `We have recognized that hurdles like ${addictions.slice(0, 2).join(' & ')} currently leak your attention. We will systematically insulate you from these. `;
+  } else if (addictions.includes('None of these')) {
+    letter += `You enter this cycle free of heavy habit drag, giving us clean leverage for rapid optimization. `;
+  }
+
+  // Vision mapping
+  if (vision.length > 0) {
+    letter += `Within the next 12 months, your efforts will focus on compounding changes in your ${vision.slice(0, 2).join(' and ')} to construct ${mindset.toLowerCase().replace('a ', '')}. `;
+  }
+
+  // Challenge closing remarks
+  if (challenge === 'Elite Challenge Mode') {
+    letter += `Elite mode enabled: prepare for absolute stoic accountability, deliberate friction, and deep character refinement. Let the forge begin.`;
+  } else if (challenge === 'Serious Transformation') {
+    letter += `Serious mode enabled: high accountability will transform your consistency into concrete physical results. Stand up and claim it.`;
+  } else if (challenge === 'Gentle & Supportive') {
+    letter += `Gentle growth mode enabled: sustainable, friction-free changes and rich mindfulness will be your compounding superpowers. Breathe and advance.`;
+  } else {
+    letter += `Balanced growth mode enabled: steady challenges will scale with your adaptation to guarantee unshakeable habit integration. Ready yourself.`;
+  }
   
   // 3. Stage compilation
   let stage1 = 'Circadian Synchronization & Vigor';
@@ -1276,27 +1624,45 @@ function compileAlgorithmRoadmap() {
   let stage3 = 'Compounding Daily Reflex Loops';
   let stage4 = 'Peak System Scaling & Autonomy';
   
+  // Dynamic prefixes based on challenge intensity
+  let challengePrefix1 = '';
+  let challengePrefix2 = '';
+  let challengePrefix3 = '';
+  let challengePrefix4 = '';
+  
+  if (challenge === 'Elite Challenge Mode') {
+    challengePrefix1 = 'Aggressive ';
+    challengePrefix2 = 'Hyper-Insulated ';
+    challengePrefix3 = 'Military-Grade ';
+    challengePrefix4 = 'Autonomous Sovereign ';
+  } else if (challenge === 'Serious Transformation') {
+    challengePrefix1 = 'Accountable ';
+    challengePrefix2 = 'Isolate ';
+    challengePrefix3 = 'Compounded ';
+    challengePrefix4 = 'High-Performance ';
+  }
+
   if (chosenAreas.includes('Physical Health & Fitness')) {
-    stage1 = 'Circadian Reset & Dynamic Movement';
+    stage1 = challengePrefix1 + 'Circadian Reset & Dynamic Movement';
   }
   if (chosenAreas.includes('Sleep & Energy') && flowAns.sleep_state && flowAns.sleep_state.includes('Poor')) {
-    stage1 = 'Circadian Sync & Sleep Routine Setup';
+    stage1 = challengePrefix1 + 'Circadian Sync & Sleep Routine Setup';
   }
   
   if (chosenAreas.includes('Focus & Productivity') || chosenAreas.includes('Education & Learning')) {
-    stage2 = 'Attention Anchoring & Distraction Shielding';
+    stage2 = challengePrefix2 + 'Attention Anchoring & Distraction Shielding';
   }
   
   if (chosenAreas.includes('Discipline & Consistency') || chosenAreas.includes('Motivation & Purpose')) {
-    stage3 = 'Stoic Habit Loops & Friction Elimination';
+    stage3 = challengePrefix3 + 'Stoic Habit Loops & Friction Elimination';
   }
   
   if (chosenAreas.includes('Relationships & Social Life')) {
-    stage3 = 'Empathy Rings & Social Boundaries';
+    stage3 = challengePrefix3 + 'Empathy Rings & Social Boundaries';
   }
   
   if (chosenAreas.includes('Career & Financial Growth')) {
-    stage4 = 'Elite Professional Performance & Asset Scaling';
+    stage4 = challengePrefix4 + 'Elite Professional Performance & Asset Scaling';
   }
   
   return {
