@@ -572,27 +572,63 @@ const ALL_FLOW_NODES = {
 
   // 6. RELATIONSHIPS & SOCIAL LIFE (Conditional)
   relationships_q1: {
-    type: 'single',
-    title: "How satisfied are you with your social circle right now?",
-    subtitle: "",
-    options: [
-      { id: 'rel_q1_isolated', text: "Isolated — focusing on goals made me neglect people.", desc: "Focusing heavily on goals isolated you from key personal connections.", icon: 'user' },
-      { id: 'rel_q1_no_deep', text: "Surrounded by people, but lacking deep, value-aligned bonds.", desc: "Lack of deep, meaningful, values-aligned partnerships or friends.", icon: 'users' },
-      { id: 'rel_q1_mentors', text: "Happy with my circle, but I lack network presence/mentors.", desc: "Good friends, but seeking noble peers and professional guides.", icon: 'award' }
-    ],
-    save: (val) => {
-      state.sessionData.flow_responses.relationships_q1 = val;
+    type: 'multiple',
+    title: "Where do you currently invest or spend most of your time socially?",
+    subtitle: "Select all options that apply.",
+    get options() {
+      const gender = state.sessionData?.basic_info?.gender || (typeof userState !== 'undefined' && userState?.genderIdentity) || '';
+      let romanticPartnerText = "With my Partner";
+      if (gender === 'Male') {
+        romanticPartnerText = "With my Girlfriend";
+      } else if (gender === 'Female') {
+        romanticPartnerText = "With my Boyfriend";
+      }
+
+      return [
+        { id: 'rel_q1_alone', text: "Mostly Alone", desc: "Focusing heavily on self-reliance or feeling disconnected.", icon: 'user' },
+        { id: 'rel_q1_family', text: "With Family", desc: "Spending significant time with parents, siblings, or relatives.", icon: 'home' },
+        { id: 'rel_q1_friends', text: "With Friends / Peers", desc: "Spending time with friend circles, study peers, or coworkers.", icon: 'users' },
+        { id: 'rel_q1_romantic', text: romanticPartnerText, desc: "Spending quality time investing in your primary romantic partnership.", icon: 'heart' }
+      ];
+    },
+    save: (vals) => {
+      state.sessionData.flow_responses.relationships_q1 = vals;
+      buildDynamicQueue();
     }
   },
 
-  relationships_q2: {
+  relationships_q2_active: {
     type: 'single',
-    title: "What is your main struggle with maintaining relationships?",
+    get title() {
+      const gender = state.sessionData?.basic_info?.gender || (typeof userState !== 'undefined' && userState?.genderIdentity) || '';
+      let partnerLabel = "Partner";
+      if (gender === 'Male') partnerLabel = "Girlfriend";
+      else if (gender === 'Female') partnerLabel = "Boyfriend";
+      return `How would you honestly describe the current state of your relationship with your ${partnerLabel}?`;
+    },
     subtitle: "",
     options: [
-      { id: 'rel_q2_forget', text: "I simply forget to check in consistently due to a tight schedule.", desc: "Neglecting relationships due to intense work focus loops.", icon: 'clock' },
-      { id: 'rel_q2_drain', text: "Socializing completely drains my energy for studying/working.", desc: "Struggling to balance focus blocks and boundary limits.", icon: 'battery-low' },
-      { id: 'rel_q2_toxic', text: "Dealing with toxic environments or people who drain my drive.", desc: "Unsupportive surroundings depleting baseline motivation.", icon: 'alert-triangle' }
+      { id: 'rel_q2_elite', text: "Elite Sync", desc: "Mutual support, deep values alignment, and shared micro-routines.", icon: 'zap' },
+      { id: 'rel_q2_passive', text: "Passive Distance", desc: "Comfortable but drifting, lacking deep communication focus.", icon: 'compass' },
+      { id: 'rel_q2_volatility', text: "Constant Volatility", desc: "Frequent misunderstandings and energy drainage. (Score deduction: -20 MIND)", icon: 'battery-low' },
+      { id: 'rel_q2_toxic', text: "Toxic Trap", desc: "Heavy emotional drama depleting study/work grit. (Score deduction: -25 PURPOSE)", icon: 'alert-triangle' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.relationships_q2 = val;
+    }
+  },
+
+
+  relationships_q2_history: {
+    type: 'single',
+    title: "Have you been in a romantic relationship recently?",
+    subtitle: "",
+    options: [
+      { id: 'rel_q2_h_recent', text: "Yes, currently or recently (< 1 month)", desc: "Fresh separation or loosely looking for new alignment.", icon: 'refresh-cw' },
+      { id: 'rel_q2_h_medium', text: "Yes (Between 1 to 6 months ago)", desc: "Processing lessons, focusing on routine stabilization.", icon: 'calendar' },
+      { id: 'rel_q2_h_year', text: "Yes (Between 6 months to 1 year ago)", desc: "Recovering autonomy, building high-performance lifestyle.", icon: 'lock' },
+      { id: 'rel_q2_h_long', text: "Yes (Long term, > 1 year ago)", desc: "Substantial single block, established individual habits.", icon: 'shield' },
+      { id: 'rel_q2_h_never', text: "No, I’ve been single for a long time / never in one", desc: "Focusing purely on self-sovereignty and absolute focus goals.", icon: 'compass' }
     ],
     save: (val) => {
       state.sessionData.flow_responses.relationships_q2 = val;
@@ -600,23 +636,39 @@ const ALL_FLOW_NODES = {
   },
 
   relationships_q3: {
-    type: 'multiple',
-    title: "We need to protect your social battery. What are we optimizing here?",
+    type: 'single',
+    title: "Let's audit the rest of your core social structure. Which of these bottlenecks hits closest to home right now?",
     subtitle: "",
-    options: [
-      { id: 'rel_q3_reminders', text: "A smart reminder loop so I never neglect my closest family and friends.", desc: "Inner circle check-in scheduling reminders.", icon: 'calendar' },
-      { id: 'rel_q3_boundaries', text: "A strict boundary-setting tool to balance social time with my focus blocks.", desc: "Social capacity and boundary tracking blueprints.", icon: 'lock' },
-      { id: 'rel_q3_peers', text: "Access to value-aligned peer tracking to match my lifestyle goals.", desc: "Connection vectors to sync targets with high-performance peers.", icon: 'trending-up' }
-    ],
-    save: (vals) => {
-      state.sessionData.flow_responses.relationships_q3 = vals;
+    get options() {
+      const q1Ans = state.sessionData.flow_responses?.relationships_q1 || [];
+      const opts = [];
+
+      if (q1Ans.includes("Mostly Alone")) {
+        opts.push({ id: 'rel_q3_isolation', text: "Isolation Sink", desc: "I have zero social outlets and feel completely cut off.", icon: 'user-x' });
+      }
+      if (q1Ans.includes("With Family")) {
+        opts.push({ id: 'rel_q3_family', text: "Family Friction", desc: "High family expectations or domestic drama are breaking my focus.", icon: 'home' });
+      }
+      if (q1Ans.includes("With Friends / Peers")) {
+        opts.push({ id: 'rel_q3_peers', text: "Low-Vibe Circle", desc: "My current friends are complacent; they just want to kill time.", icon: 'users' });
+      }
+      
+      // Render permanent baseline fallback option
+      opts.push({ id: 'rel_q3_none', text: "Zero Friction", desc: "My remaining social circles are stable; I just need to execute.", icon: 'shield-check' });
+
+      return opts;
+    },
+    save: (val) => {
+      state.sessionData.flow_responses.relationships_q3 = val;
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (vals.includes("A smart reminder loop so I never neglect my closest family and friends.")) {
-        state.sessionData.dashboard_offers.social = 'Inner Circle Automation Reminders';
-      } else if (vals.includes("A strict boundary-setting tool to balance social time with my focus blocks.")) {
-        state.sessionData.dashboard_offers.social = 'Boundary-Setting & Social Capacity Protocol';
+      if (val === "Isolation Sink") {
+        state.sessionData.dashboard_offers.social = 'Social Connection & Vibe Alignment Protocol';
+      } else if (val === "Family Friction") {
+        state.sessionData.dashboard_offers.social = 'Stoic Boundaries & Compassion Rings Map';
+      } else if (val === "Low-Vibe Circle") {
+        state.sessionData.dashboard_offers.social = 'Attention Insulation & Peer Upgrades Vault';
       } else {
-        state.sessionData.dashboard_offers.social = 'Social Networking & Value Alignment Tracker';
+        state.sessionData.dashboard_offers.social = 'Inner Circle Automation Reminders';
       }
     }
   },
@@ -978,7 +1030,16 @@ function buildDynamicQueue() {
 
   // 6. Relationships & Social Life
   if (chosen.includes('Relationships & Social Life')) {
-    dynamicNodes.push('relationships_q1', 'relationships_q2', 'relationships_q3');
+    dynamicNodes.push('relationships_q1');
+    const q1Ans = state.sessionData.flow_responses?.relationships_q1 || [];
+    const hasRomantic = q1Ans.includes("With my Girlfriend") || q1Ans.includes("With my Boyfriend") || q1Ans.includes("With my Partner");
+    
+    if (hasRomantic) {
+      dynamicNodes.push('relationships_q2_active');
+    } else {
+      dynamicNodes.push('relationships_q2_history');
+    }
+    dynamicNodes.push('relationships_q3');
   }
 
   const universalEndNodes = [
@@ -1970,13 +2031,33 @@ function calculateLifeMapMetrics() {
   let connection = 85;
   if (focus.includes('Relationships & Social Life')) {
     connection = 100;
-    const relQ1 = flow.relationships_q1 || '';
-    if (relQ1 === 'Isolated — focusing on goals made me neglect people.') {
-      connection -= 45;
-    } else if (relQ1 === 'Surrounded by people, but lacking deep, value-aligned bonds.') {
+    
+    // Q1 Checkbox Multiselect
+    const relQ1 = flow.relationships_q1 || [];
+    if (Array.isArray(relQ1)) {
+      if (relQ1.includes("Mostly Alone")) {
+        connection -= 30;
+      }
+    } else if (typeof relQ1 === 'string' && relQ1.includes("Mostly Alone")) {
+      connection -= 30;
+    }
+    
+    // Q2 Branch routing answers
+    const relQ2 = flow.relationships_q2 || '';
+    if (relQ2 === 'Constant Volatility') {
+      mind -= 20;
+    } else if (relQ2 === 'Toxic Trap') {
+      purpose -= 25;
+    }
+    
+    // Q3 Bottlenecks
+    const relQ3 = flow.relationships_q3 || '';
+    if (relQ3 === 'Isolation Sink') {
+      connection -= 25;
+    } else if (relQ3 === 'Family Friction') {
+      connection -= 15;
+    } else if (relQ3 === 'Low-Vibe Circle') {
       connection -= 20;
-    } else if (relQ1 === 'Happy with my circle, but I lack network presence/mentors.') {
-      connection -= 10;
     }
   }
 
