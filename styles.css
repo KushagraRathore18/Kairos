@@ -3558,6 +3558,10 @@ html, body {
 .block {
   display: block !important;
 }
+.layout-flush {
+  margin-top: 24px !important;
+  padding-top: 0 !important;
+}
 .mt-12 {
   margin-top: 48px !important;
 }

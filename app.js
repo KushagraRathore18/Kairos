@@ -2684,7 +2684,7 @@ function renderWhatsHoldingYouBack(viewWrap) {
     </div>
 
     <!-- 3-Column Metrics Panel Row: How Kairos Will Help -->
-    <div class="w-full mt-6 clear-both block max-w-6xl mx-auto px-4 md:px-8">
+    <div class="w-full block clear-both mt-6 pt-0 layout-flush max-w-6xl mx-auto px-4 md:px-8">
       <div class="p-6 md:p-8 border border-neutral-800 bg-zinc-950/40 rounded-xl">
         <h3 style="margin: 0 0 24px 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; text-align: center;">How Kairos Will Help</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
