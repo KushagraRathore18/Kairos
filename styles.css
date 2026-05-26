@@ -3597,6 +3597,134 @@ html, body {
   border-left: 4px solid var(--accent-indigo) !important;
 }
 
+/* --- Strategic Alignment Premium UI/UX Redesign --- */
+
+/* Reality Loop Card Container (Red Accent Glow) */
+.reality-loop-card {
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+  background: rgba(9, 9, 11, 0.75) !important;
+  box-shadow: 0 10px 40px -10px rgba(239, 68, 68, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.03) !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.reality-loop-card:hover {
+  border-color: rgba(239, 68, 68, 0.25) !important;
+  box-shadow: 0 15px 45px -10px rgba(239, 68, 68, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+/* How You Break the Loop Card Container (Indigo Accent Glow) */
+.kairos-break-card {
+  border: 1px solid rgba(99, 102, 241, 0.15) !important;
+  background: rgba(9, 9, 11, 0.75) !important;
+  box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.03) !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.kairos-break-card:hover {
+  border-color: rgba(99, 102, 241, 0.25) !important;
+  box-shadow: 0 15px 45px -10px rgba(99, 102, 241, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+/* The Kairos Advantage Card Container (Purple Accent Glow) */
+.kairos-advantage-card {
+  border: 1px solid rgba(168, 85, 247, 0.15) !important;
+  background: rgba(9, 9, 11, 0.6) !important;
+  box-shadow: 0 10px 40px -10px rgba(168, 85, 247, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.03) !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.kairos-advantage-card:hover {
+  border-color: rgba(168, 85, 247, 0.25) !important;
+  box-shadow: 0 15px 45px -10px rgba(168, 85, 247, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Individual Strategy Cards inside Right Column */
+.strategy-mini-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  background: rgba(255, 255, 255, 0.01) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.strategy-mini-card:hover {
+  border-color: rgba(99, 102, 241, 0.3) !important;
+  background: rgba(99, 102, 241, 0.04) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.05) !important;
+}
+
+.strategy-icon-box {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.08) !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  color: #818cf8 !important;
+  flex-shrink: 0;
+}
+
+.strategy-index {
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(99, 102, 241, 0.6) !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  border-radius: 4px;
+  padding: 2px 6px;
+  align-self: center;
+  flex-shrink: 0;
+  line-height: 1 !important;
+}
+
+.advantage-icon-box {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.08) !important;
+  border: 1px solid rgba(168, 85, 247, 0.2) !important;
+  color: #c084fc !important;
+  flex-shrink: 0;
+}
+
+.slider-track-container {
+  height: 2px !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  position: relative;
+  border-radius: 9999px;
+  overflow: visible;
+}
+.slider-bullet {
+  position: absolute;
+  left: 0;
+  top: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a855f7 !important;
+  box-shadow: 0 0 10px #a855f7 !important;
+}
+
+/* Stagnation Dot Premium Coloring */
+.stagnation-dot-premium {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #ef4444 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
 
 
 
