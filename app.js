@@ -2488,7 +2488,7 @@ function renderProfileLifeMap(viewWrap) {
 
 // SCREEN: "Friction & Strategy Analysis" Insights Page
 function renderWhatsHoldingYouBack(viewWrap) {
-  viewWrap.className = 'page-view';
+  viewWrap.className = 'page-view page-view-wide';
   viewWrap.innerHTML = `
     <div class="question-header" style="margin-bottom: 40px; text-align: center;">
       <span class="question-pre">Friction & Strategy Analysis</span>
@@ -2497,130 +2497,132 @@ function renderWhatsHoldingYouBack(viewWrap) {
     </div>
 
     <!-- 2-Column Responsive Layout Container Grid -->
-    <div class="friction-analysis-layout-grid">
+    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-4 md:px-8 items-start mt-8">
       
-      <!-- COLUMN 1: Why Most People Stay Stuck -->
-      <div class="friction-column-left">
-        <div class="friction-card-header">
-          <span class="friction-card-pre">The Reality Loop</span>
-          <h3 class="friction-card-title">Why Most People Stay Stuck</h3>
-        </div>
-
-        <div class="stagnation-timeline">
-          <div class="stagnation-step">
-            <div class="stagnation-dot">
-              <i data-lucide="zap-off" style="width: 14px; height: 14px;"></i>
-            </div>
-            <div class="stagnation-details">
-              <span class="stagnation-step-title">1. Motivation fades quickly</span>
-              <p class="stagnation-step-desc">Initial emotional drive sparks quick starts but evaporates when real resistance hits.</p>
-            </div>
+      <!-- COLUMN 1: Why Most People Stay Stuck (The Reality Loop) -->
+      <div class="w-full">
+        <div class="p-6 md:p-8 border border-neutral-800 bg-zinc-950/50 rounded-xl">
+          <div class="friction-card-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 20px; margin-bottom: 24px;">
+            <span class="friction-card-pre" style="font-family: 'Outfit', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-indigo); display: block; margin-bottom: 6px; font-weight: 600;">The Reality Loop</span>
+            <h3 class="friction-card-title" style="font-family: 'Outfit', sans-serif; font-size: 24px; margin: 0; font-weight: 700; color: #fff; letter-spacing: -0.5px;">Why Most People Stay Stuck</h3>
           </div>
 
-          <div class="stagnation-step">
-            <div class="stagnation-dot">
-              <i data-lucide="smartphone" style="width: 14px; height: 14px;"></i>
+          <div class="stagnation-timeline" style="display: flex; flex-direction: column; gap: 28px;">
+            <div class="stagnation-step" style="display: flex; gap: 20px; position: relative;">
+              <div class="stagnation-dot" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 69, 58, 0.08); border: 1px solid rgba(255, 69, 58, 0.3); color: #ff453a; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; flex-shrink: 0;">
+                <i data-lucide="zap-off" style="width: 14px; height: 14px;"></i>
+              </div>
+              <div class="stagnation-details">
+                <span class="stagnation-step-title" style="font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; display: block;">1. Motivation fades quickly</span>
+                <p class="stagnation-step-desc" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 4px 0 0 0;">Initial emotional drive sparks quick starts but evaporates when real resistance hits.</p>
+              </div>
             </div>
-            <div class="stagnation-details">
-              <span class="stagnation-step-title">2. Distractions break consistency</span>
-              <p class="stagnation-step-desc">Unprotected focus environments and daily digital loops trigger procrastination patterns.</p>
-            </div>
-          </div>
 
-          <div class="stagnation-step">
-            <div class="stagnation-dot">
-              <i data-lucide="compass" style="width: 14px; height: 14px;"></i>
+            <div class="stagnation-step" style="display: flex; gap: 20px; position: relative;">
+              <div class="stagnation-dot" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 69, 58, 0.08); border: 1px solid rgba(255, 69, 58, 0.3); color: #ff453a; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; flex-shrink: 0;">
+                <i data-lucide="smartphone" style="width: 14px; height: 14px;"></i>
+              </div>
+              <div class="stagnation-details">
+                <span class="stagnation-step-title" style="font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; display: block;">2. Distractions break consistency</span>
+                <p class="stagnation-step-desc" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 4px 0 0 0;">Unprotected focus environments and daily digital loops trigger procrastination patterns.</p>
+              </div>
             </div>
-            <div class="stagnation-details">
-              <span class="stagnation-step-title">3. Goals become unclear</span>
-              <p class="stagnation-step-desc">Vague progress definitions lead directly to choice fatigue and execution blockages.</p>
-            </div>
-          </div>
 
-          <div class="stagnation-step">
-            <div class="stagnation-dot">
-              <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+            <div class="stagnation-step" style="display: flex; gap: 20px; position: relative;">
+              <div class="stagnation-dot" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 69, 58, 0.08); border: 1px solid rgba(255, 69, 58, 0.3); color: #ff453a; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; flex-shrink: 0;">
+                <i data-lucide="compass" style="width: 14px; height: 14px;"></i>
+              </div>
+              <div class="stagnation-details">
+                <span class="stagnation-step-title" style="font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; display: block;">3. Goals become unclear</span>
+                <p class="stagnation-step-desc" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 4px 0 0 0;">Vague progress definitions lead directly to choice fatigue and execution blockages.</p>
+              </div>
             </div>
-            <div class="stagnation-details">
-              <span class="stagnation-step-title">4. People restart endlessly</span>
-              <p class="stagnation-step-desc">Without high-quality habit anchors, you loop indefinitely at absolute baseline limits.</p>
+
+            <div class="stagnation-step" style="display: flex; gap: 20px; position: relative;">
+              <div class="stagnation-dot" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 69, 58, 0.08); border: 1px solid rgba(255, 69, 58, 0.3); color: #ff453a; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; flex-shrink: 0;">
+                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+              </div>
+              <div class="stagnation-details">
+                <span class="stagnation-step-title" style="font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; display: block;">4. People restart endlessly</span>
+                <p class="stagnation-step-desc" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 4px 0 0 0;">Without high-quality habit anchors, you loop indefinitely at absolute baseline limits.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- COLUMN 2: Your Personal Analysis -->
-      <div class="friction-column-right">
+      <!-- COLUMN 2: Friction Points & Strategies -->
+      <div class="w-full flex flex-col gap-8">
         
-        <!-- SECTION 1: Your Current Friction Points -->
-        <div class="bottlenecks-section" style="display: flex; flex-direction: column; gap: 16px;">
-          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px;">Your Current Friction Points</h3>
+        <!-- Top Section: Your Current Friction Points -->
+        <div class="flex flex-col gap-4">
+          <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif;">Your Current Friction Points</h3>
           
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div class="struggle-item glow-card" style="padding: 18px 24px; border-bottom: 2px solid rgba(239, 68, 68, 0.2); background: rgba(255,255,255,0.01); display: flex; align-items: center; gap: 16px; min-height: auto; border-left: none; margin-bottom: 0;">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
               <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ff453a; flex-shrink: 0; margin: 0;">
                 <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
               </div>
-              <div class="struggle-details" style="text-align: left;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left;">Motivation Dependency</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 2px 0 0 0; text-align: left;">Relying purely on emotional inspiration rather than built-in habit structures.</p>
+              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Motivation Dependency</span>
+                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Relying purely on emotional inspiration rather than built-in habit structures.</p>
               </div>
             </div>
 
-            <div class="struggle-item glow-card" style="padding: 18px 24px; border-bottom: 2px solid rgba(239, 68, 68, 0.2); background: rgba(255,255,255,0.01); display: flex; align-items: center; gap: 16px; min-height: auto; border-left: none; margin-bottom: 0;">
+            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
               <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ff453a; flex-shrink: 0; margin: 0;">
                 <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
               </div>
-              <div class="struggle-details" style="text-align: left;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left;">Focus Fragmentation</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 2px 0 0 0; text-align: left;">Dividing daily attention across notifications, tasks, and digital loops.</p>
+              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Focus Fragmentation</span>
+                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Dividing daily attention across notifications, tasks, and digital loops.</p>
               </div>
             </div>
 
-            <div class="struggle-item glow-card" style="padding: 18px 24px; border-bottom: 2px solid rgba(239, 68, 68, 0.2); background: rgba(255,255,255,0.01); display: flex; align-items: center; gap: 16px; min-height: auto; border-left: none; margin-bottom: 0;">
+            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
               <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ff453a; flex-shrink: 0; margin: 0;">
                 <i data-lucide="navigation" style="width: 16px; height: 16px;"></i>
               </div>
-              <div class="struggle-details" style="text-align: left;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left;">Inconsistent Direction</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 2px 0 0 0; text-align: left;">Attempting to progress without a highly structured daily program path.</p>
+              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Inconsistent Direction</span>
+                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Attempting to progress without a highly structured daily program path.</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- SECTION 2: How Kairos Will Help -->
-        <div class="helpers-section" style="display: flex; flex-direction: column; gap: 16px;">
-          <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px;">How Kairos Will Help</h3>
+        <!-- Bottom Section: How Kairos Will Help -->
+        <div class="flex flex-col gap-4">
+          <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif;">How Kairos Will Help</h3>
           
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div class="plan-helper-card glow-card" style="padding: 18px 24px; background: rgba(255,255,255,0.01); display: flex; align-items: center; gap: 16px;">
-              <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0;">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
+              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
                 <i data-lucide="anchor" style="width: 16px; height: 16px;"></i>
               </div>
-              <div class="struggle-details" style="text-align: left;">
-                <span class="plan-helper-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left;">Habit Anchoring</span>
-                <p class="plan-helper-desc" style="font-size: 12px; color: var(--text-secondary); margin: 2px 0 0 0; text-align: left;">Frictionless 5-minute micro-habits that completely bypass brain resistance.</p>
+              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Habit Anchoring</span>
+                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Frictionless 5-minute micro-habits that completely bypass brain resistance.</p>
               </div>
             </div>
 
-            <div class="plan-helper-card glow-card" style="padding: 18px 24px; background: rgba(255,255,255,0.01); display: flex; align-items: center; gap: 16px;">
-              <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0;">
+            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
+              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
                 <i data-lucide="shield" style="width: 16px; height: 16px;"></i>
               </div>
-              <div class="struggle-details" style="text-align: left;">
-                <span class="plan-helper-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left;">Distraction Protection</span>
-                <p class="plan-helper-desc" style="font-size: 12px; color: var(--text-secondary); margin: 2px 0 0 0; text-align: left;">Attention barriers that insulate your high-performance focus blocks.</p>
+              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Distraction Protection</span>
+                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Attention barriers that insulate your high-performance focus blocks.</p>
               </div>
             </div>
 
-            <div class="plan-helper-card glow-card" style="padding: 18px 24px; background: rgba(255,255,255,0.01); display: flex; align-items: center; gap: 16px;">
-              <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0;">
+            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
+              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
                 <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i>
               </div>
-              <div class="struggle-details" style="text-align: left;">
-                <span class="plan-helper-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left;">Consistency Scaling</span>
-                <p class="plan-helper-desc" style="font-size: 12px; color: var(--text-secondary); margin: 2px 0 0 0; text-align: left;">Calibrated baseline progression targets that grow only as self-trust scales.</p>
+              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Consistency Scaling</span>
+                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Calibrated baseline progression targets that grow only as self-trust scales.</p>
               </div>
             </div>
           </div>
@@ -2630,8 +2632,8 @@ function renderWhatsHoldingYouBack(viewWrap) {
 
     </div>
 
-    <!-- Centered CTA with large top spacing and no crowding -->
-    <div class="action-bar" style="margin-top: 64px; margin-bottom: 20px; display: flex; justify-content: center; width: 100%;">
+    <!-- Centered CTA with healthy top margin and complete isolation -->
+    <div class="action-bar mt-12" style="margin-bottom: 20px; display: flex; justify-content: center; width: 100%;">
       <button id="btn-submit-struggles" class="btn-premium primary" style="padding: 16px 40px; font-size: 15px; font-weight: 600; min-width: 280px; justify-content: center; display: inline-flex; align-items: center; gap: 8px;">
         <span>Continue to Your Roadmap →</span>
         <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
