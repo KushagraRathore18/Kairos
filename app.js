@@ -570,11 +570,9 @@ const ALL_FLOW_NODES = {
     }
   },
 
-  // 6. RELATIONSHIPS & SOCIAL LIFE (Conditional)
-  // 6. RELATIONSHIPS & SOCIAL LIFE (Conditional)
   relationships_q1: {
     type: 'multiple',
-    title: "Where do you currently invest or spend most of your time socially?",
+    title: "Where do you invest your time socially?",
     subtitle: "Select all options that apply.",
     get options() {
       const gender = state.sessionData?.basic_info?.gender || (typeof userState !== 'undefined' && userState?.genderIdentity) || '';
@@ -603,28 +601,50 @@ const ALL_FLOW_NODES = {
     title: "What is the current status of your romantic relationship?",
     subtitle: "Choose the statement that fits best.",
     options: [
-      { id: 'rel_q2_strong', text: "Strong & Supportive", desc: "Mutual support, deep values alignment, and healthy daily focus.", icon: 'zap' },
-      { id: 'rel_q2_drifting', text: "Slowly Drifting Apart", desc: "Comfortable but drifting, lacking deep communication focus.", icon: 'compass' },
-      { id: 'rel_q2_exhausting', text: "Emotionally Exhausting", desc: "Frequent misunderstandings, arguments, and energy drainage.", icon: 'battery-low' },
-      { id: 'rel_q2_toxic', text: "Toxic & Hurting My Peace", desc: "Heavy emotional drama actively depleting work/study grit.", icon: 'alert-triangle' }
+      { id: 'rel_q2_strong', text: "Supportive Anchor", desc: "Partner aligns with my growth and respects my deep focus.", icon: 'shield' },
+      { id: 'rel_q2_exhausting', text: "Constant Conflict / Drain", desc: "Frequent arguments or emotional volatility are consuming my energy.", icon: 'battery-low' },
+      { id: 'rel_q2_drifting', text: "Ambivalent / Unsure", desc: "We are drifting apart or lacking a shared vector of purpose.", icon: 'compass' },
+      { id: 'rel_q2_toxic', text: "Long-Distance Strain", desc: "Logistical separation is creating communication bottlenecks.", icon: 'globe' }
     ],
     save: (val) => {
-      state.sessionData.flow_responses.relationships_q2 = val;
+      // Map for scoring engine compatibility
+      let mapped = val;
+      if (val === "Constant Conflict / Drain") {
+        mapped = "Toxic & Hurting My Peace";
+      } else if (val === "Ambivalent / Unsure") {
+        mapped = "Emotionally Exhausting";
+      } else if (val === "Long-Distance Strain") {
+        mapped = "Slowly Drifting Apart";
+      }
+      state.sessionData.flow_responses.relationships_q2 = mapped;
     }
   },
 
-  relationships_q2_social_circle: {
+  relationships_q2_friends: {
     type: 'single',
-    title: "How would you describe the active baseline energy of your primary social circle?",
-    subtitle: "Choose the statement that fits best.",
+    title: "What is the dominant behavioral framework inside your peer group?",
+    subtitle: "Select the description that fits best.",
     options: [
-      { id: 'rel_circle_high', text: "High Energy & Ambition", desc: "Aligned peers pushing each other to level up and execute.", icon: 'zap' },
-      { id: 'rel_circle_complacent', text: "Complacent & Low Friction", desc: "Comfortable and supportive, but lacks aggressive growth.", icon: 'smile' },
-      { id: 'rel_circle_draining', text: "Chaotic & Draining", desc: "Frequent drama, digital distractions, or negative loops.", icon: 'battery-low' },
-      { id: 'rel_circle_neutral', text: "Mostly Neutral / Passive", desc: "Low alignment but minimal active drag or friction.", icon: 'compass' }
+      { id: 'rel_friends_sinking', text: "The Sinking Ship", desc: "Heavy substance use, chronic digital escapism, and defensive deflection of growth.", icon: 'alert-triangle' },
+      { id: 'rel_friends_comfort', text: "The Comfort Zone", desc: "Generous and nice people, but zero personal drive; lifestyle revolves entirely around killing time.", icon: 'coffee' },
+      { id: 'rel_friends_distant', text: "The Distant Echo", desc: "I have regular surface-level contacts, but zero deep emotional alignment or authentic trust.", icon: 'message-square-off' }
     ],
     save: (val) => {
-      state.sessionData.flow_responses.relationships_q2 = val;
+      state.sessionData.flow_responses.relationships_q2_friends = val;
+    }
+  },
+
+  relationships_q2_family: {
+    type: 'single',
+    title: "What is the primary operational drag within your household environment?",
+    subtitle: "Select the description that fits best.",
+    options: [
+      { id: 'rel_family_control', text: "Hyper-Control", desc: "Authoritarian micro-management, unrealistic expectations, and total disregard for personal boundaries.", icon: 'lock' },
+      { id: 'rel_family_chaos', text: "Operational Chaos", desc: "Constant vocal arguments, high domestic clutter, and chronic environmental noise pollution.", icon: 'volume-x' },
+      { id: 'rel_family_void', text: "The Void", desc: "Emotional apathy; my family lives completely parallel lives with zero mutual interest or performance support.", icon: 'eye-off' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.relationships_q2_family = val;
     }
   },
 
@@ -688,11 +708,11 @@ const ALL_FLOW_NODES = {
     title: "What is your primary internal bottleneck when dealing with people?",
     subtitle: "Select the closest bottleneck.",
     options: [
-      { id: 'rel_q4_anxiety', text: "Overthinking & Social Anxiety", desc: "Fear of judgment or over-analyzing social interactions.", icon: 'alert-circle' },
-      { id: 'rel_q4_pleasing', text: "Weak Boundaries / People Pleasing", desc: "Sacrificing personal priorities to appease others.", icon: 'shield-alert' },
-      { id: 'rel_q4_validation', text: "Validation Seeking / Status Addiction", desc: "Chasing external approval or social comparison loops.", icon: 'award' },
-      { id: 'rel_q4_isolation', text: "Emotional Isolation / Hyper-Independence", desc: "Pushing people away and refusing to look for help.", icon: 'lock' },
-      { id: 'rel_q4_confident', text: "Fully Calibrated", desc: "I communicate cleanly, speak with conviction, and protect my energy.", icon: 'shield-check' }
+      { id: 'rel_q4_anxiety', text: "Overthinking & Social Anxiety", desc: "Fear of negative evaluation, self-doubt, or over-analyzing micro-interactions.", icon: 'alert-circle' },
+      { id: 'rel_q4_pleasing', text: "Weak Boundaries / People Pleasing", desc: "Chronically sacrificing personal priorities and schedules to appease external demands.", icon: 'shield-alert' },
+      { id: 'rel_q4_validation', text: "Validation Seeking / Status Addiction", desc: "Trapped in external approval feedback loops, social comparison, or online status chasing.", icon: 'award' },
+      { id: 'rel_q4_isolation', text: "Emotional Isolation / Hyper-Independence", desc: "Systematically pushing people away, rejecting vulnerability, and refusing to build deep bridges.", icon: 'lock' },
+      { id: 'rel_q4_confident', text: "Fully Calibrated", desc: "I express myself clearly, protect my daily boundaries with conviction, and execute effortlessly.", icon: 'shield-check' }
     ],
     save: (val) => {
       // Map to exact scoring matches
@@ -1068,24 +1088,26 @@ function buildDynamicQueue() {
   // 6. Relationships & Social Life
   if (chosen.includes('Relationships & Social Life')) {
     dynamicNodes.push('relationships_q1');
-    const q1Ans = state.sessionData.flow_responses?.relationships_q1 || [];
+    const userSelections = state.sessionData.flow_responses?.relationships_q1 || [];
     
-    // Task 1: Step 1 Checkbox State Evaluation Array
-    const hasAlone = q1Ans.includes("Mostly Alone");
-    const hasFamily = q1Ans.includes("With Family");
-    const hasFriends = q1Ans.includes("With Friends / Peers");
-    const hasPartner = q1Ans.includes("With my Girlfriend") || q1Ans.includes("With my Boyfriend") || q1Ans.includes("With my Partner");
+    // Task 1: Initialize the Multi-Select Boolean Matrix from Step 1
+    const hasAlone = userSelections.includes("Mostly Alone");
+    const hasFamily = userSelections.includes("With Family");
+    const hasFriends = userSelections.includes("With Friends / Peers");
+    const hasPartner = userSelections.includes("With my Girlfriend") || userSelections.includes("With my Boyfriend") || userSelections.includes("With my Partner");
 
-    // Task 2: Perfect Permutation Routing Logic
+    // Task 2: Execute Uncrushable Permutation Routing for Step 2A (Romantic Evaluation)
     if (hasPartner === true) {
       dynamicNodes.push('relationships_q2_active');
-    } else if (hasPartner === false && (hasFamily === true || hasFriends === true)) {
-      dynamicNodes.push('relationships_q2_social_circle');
-    } else if (hasPartner === false && hasFamily === false && hasFriends === false && hasAlone === true) {
-      dynamicNodes.push('relationships_q2_history');
     } else {
-      // Zero edge-case fallback: if no checkboxes are selected
       dynamicNodes.push('relationships_q2_history');
+    }
+
+    // Task 3: Inject the Dynamic Deep-Dive Step 2B (Social Environment Evaluation)
+    if (hasFriends === true) {
+      dynamicNodes.push('relationships_q2_friends');
+    } else if (hasFriends === false && hasFamily === true) {
+      dynamicNodes.push('relationships_q2_family');
     }
     
     dynamicNodes.push('relationships_q3', 'relationships_q4');
