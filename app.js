@@ -2563,8 +2563,21 @@ function renderProfileLifeMap(viewWrap) {
     // Calculate & save life map dimensions directly into the session database schema
     state.sessionData.life_map = scores;
 
+    // Write state to IndexedDB securely
+    saveSession(state.sessionData)
+      .then(() => {
+        updateDBInspectorBadge();
+      })
+      .catch(err => console.error("Database write error:", err));
+
+    // Advance to next cinematic insights card
+    advanceStep();
+  });
+}
+
 // SCREEN: "Friction & Strategy Analysis" Insights Page
 function renderWhatsHoldingYouBack(viewWrap) {
+
   viewWrap.className = 'page-view page-view-wide';
   viewWrap.innerHTML = `
     <div class="question-header" style="margin-bottom: 64px; text-align: center;">
