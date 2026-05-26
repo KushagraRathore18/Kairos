@@ -571,9 +571,10 @@ const ALL_FLOW_NODES = {
   },
 
   // 6. RELATIONSHIPS & SOCIAL LIFE (Conditional)
+  // 6. RELATIONSHIPS & SOCIAL LIFE (Conditional)
   relationships_q1: {
     type: 'multiple',
-    title: "Where do you currently spend most of your social energy?",
+    title: "Where do you currently invest or spend most of your time socially?",
     subtitle: "Select all options that apply.",
     get options() {
       const gender = state.sessionData?.basic_info?.gender || (typeof userState !== 'undefined' && userState?.genderIdentity) || '';
@@ -599,7 +600,7 @@ const ALL_FLOW_NODES = {
 
   relationships_q2_active: {
     type: 'single',
-    title: "How would you honestly describe the current state of your relationship?",
+    title: "What is the current status of your romantic relationship?",
     subtitle: "Choose the statement that fits best.",
     options: [
       { id: 'rel_q2_strong', text: "Strong & Supportive", desc: "Mutual support, deep values alignment, and healthy daily focus.", icon: 'zap' },
@@ -627,48 +628,68 @@ const ALL_FLOW_NODES = {
     }
   },
 
+  relationships_q2_history: {
+    type: 'single',
+    title: "Have you been in a romantic relationship recently?",
+    subtitle: "Select your status.",
+    options: [
+      { id: 'rel_hist_recent', text: "Yes, currently or recently (< 1 month)", desc: "Fresh separation or transitional state.", icon: 'calendar' },
+      { id: 'rel_hist_mid', text: "Yes (Between 1 to 6 months ago)", desc: "Adjusting to single life and personal goals.", icon: 'compass' },
+      { id: 'rel_hist_long', text: "Yes (Between 6 months to 1 year ago)", desc: "Established single rhythm and personal focus.", icon: 'shield' },
+      { id: 'rel_hist_very_long', text: "Yes (Long term, > 1 year ago)", desc: "Long term single focus, fully independent.", icon: 'user' },
+      { id: 'rel_hist_never', text: "No, I’ve been single for a long time / never in one", desc: "Always independent focus; stable execution.", icon: 'lock' }
+    ],
+    save: (val) => {
+      state.sessionData.flow_responses.relationships_q2 = val;
+    }
+  },
+
   relationships_q3: {
     type: 'single',
-    title: "Which social challenge affects you the most right now?",
+    title: "What is your primary external bottleneck when dealing with people?",
     subtitle: "Select the primary external friction point.",
     get options() {
       const q1Ans = state.sessionData.flow_responses?.relationships_q1 || [];
+      const hasAlone = q1Ans.includes("Mostly Alone");
+      const hasFamily = q1Ans.includes("With Family");
+      const hasFriends = q1Ans.includes("With Friends / Peers");
+
       const opts = [];
 
-      if (q1Ans.includes("Mostly Alone")) {
-        opts.push({ id: 'rel_q3_isolation', text: "I feel isolated", desc: "Lacking high-vibe social outlets and feeling cut off.", icon: 'user-x' });
+      if (hasAlone) {
+        opts.push({ id: 'rel_q3_isolation', text: "Isolation Sink", desc: "I have zero active social outlets and feel completely cut off.", icon: 'user-x' });
       }
-      if (q1Ans.includes("With Family")) {
-        opts.push({ id: 'rel_q3_family', text: "Family stress", desc: "Domestic drama or high family expectations breaking focus.", icon: 'home' });
+      if (hasFamily) {
+        opts.push({ id: 'rel_q3_family', text: "Family Friction", desc: "High domestic expectations or family drama are breaking my focus.", icon: 'home' });
       }
-      if (q1Ans.includes("With Friends / Peers")) {
-        opts.push({ id: 'rel_q3_peers', text: "My circle lacks ambition", desc: "Complacent friends who just want to kill time.", icon: 'users' });
+      if (hasFriends) {
+        opts.push({ id: 'rel_q3_peers', text: "Low-Vibe Circle", desc: "My current friends are complacent and just want to kill time.", icon: 'users' });
       }
       
-      // Always show stable fallback
-      opts.push({ id: 'rel_q3_none', text: "Stable", desc: "Stable social connections; focus remains on execution.", icon: 'shield-check' });
+      // ALWAYS Push Baseline Option: "Stable Environment"
+      opts.push({ id: 'rel_q3_stable', text: "Stable Environment", desc: "My social connections are stable; focus remains on execution.", icon: 'shield-check' });
 
       return opts;
     },
     save: (val) => {
       // Map to backward compatible strings for scoring engine
       let mapped = "My social environment is mostly stable";
-      if (val === "I feel isolated") {
+      if (val === "Isolation Sink") {
         mapped = "I feel isolated from people";
-      } else if (val === "Family stress") {
+      } else if (val === "Family Friction") {
         mapped = "Family stress affects my focus";
-      } else if (val === "My circle lacks ambition") {
+      } else if (val === "Low-Vibe Circle") {
         mapped = "My circle lacks ambition or direction";
       }
       state.sessionData.flow_responses.relationships_q3 = mapped;
 
       // Custom dashboard offer logic based on env challenge
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (val === "I feel isolated") {
+      if (val === "Isolation Sink") {
         state.sessionData.dashboard_offers.social = 'Social Connection & Vibe Alignment Protocol';
-      } else if (val === "Family stress") {
+      } else if (val === "Family Friction") {
         state.sessionData.dashboard_offers.social = 'Stoic Boundaries & Compassion Rings Map';
-      } else if (val === "My circle lacks ambition") {
+      } else if (val === "Low-Vibe Circle") {
         state.sessionData.dashboard_offers.social = 'Attention Insulation & Peer Upgrades Vault';
       } else {
         state.sessionData.dashboard_offers.social = 'Inner Circle Automation Reminders';
@@ -678,21 +699,27 @@ const ALL_FLOW_NODES = {
 
   relationships_q4: {
     type: 'single',
-    title: "What is your biggest internal struggle when dealing with people?",
+    title: "What is your primary internal bottleneck when dealing with people?",
     subtitle: "Select the closest bottleneck.",
     options: [
       { id: 'rel_q4_anxiety', text: "Overthinking & Social Anxiety", desc: "Fear of judgment or over-analyzing social interactions.", icon: 'alert-circle' },
-      { id: 'rel_q4_pleasing', text: "Weak Boundaries", desc: "Sacrificing personal priorities to appease others.", icon: 'shield-alert' },
-      { id: 'rel_q4_validation', text: "Validation Seeking", desc: "Chasing external approval or status comparison loops.", icon: 'award' },
-      { id: 'rel_q4_isolation', text: "Emotional Isolation", desc: "Struggling to let people in or build deep emotional bridges.", icon: 'lock' },
-      { id: 'rel_q4_confident', text: "I communicate confidently", desc: "Confident, stable, and highly functional interpersonal states.", icon: 'shield-check' }
+      { id: 'rel_q4_pleasing', text: "Weak Boundaries / People Pleasing", desc: "Sacrificing personal priorities to appease others.", icon: 'shield-alert' },
+      { id: 'rel_q4_validation', text: "Validation Seeking / Status Addiction", desc: "Chasing external approval or social comparison loops.", icon: 'award' },
+      { id: 'rel_q4_isolation', text: "Emotional Isolation / Hyper-Independence", desc: "Pushing people away and refusing to look for help.", icon: 'lock' },
+      { id: 'rel_q4_confident', text: "Fully Calibrated", desc: "I communicate cleanly, speak with conviction, and protect my energy.", icon: 'shield-check' }
     ],
     save: (val) => {
       // Map to exact scoring matches
-      if (val === "Weak Boundaries") {
+      if (val === "Overthinking & Social Anxiety") {
+        state.sessionData.flow_responses.relationships_q4 = "Overthinking & Social Anxiety";
+      } else if (val === "Weak Boundaries / People Pleasing") {
         state.sessionData.flow_responses.relationships_q4 = "Weak Boundaries / People Pleasing";
-      } else {
-        state.sessionData.flow_responses.relationships_q4 = val;
+      } else if (val === "Validation Seeking / Status Addiction") {
+        state.sessionData.flow_responses.relationships_q4 = "Validation Seeking";
+      } else if (val === "Emotional Isolation / Hyper-Independence") {
+        state.sessionData.flow_responses.relationships_q4 = "Emotional Isolation";
+      } else if (val === "Fully Calibrated") {
+        state.sessionData.flow_responses.relationships_q4 = "I communicate confidently";
       }
     }
   },
@@ -1056,13 +1083,23 @@ function buildDynamicQueue() {
   if (chosen.includes('Relationships & Social Life')) {
     dynamicNodes.push('relationships_q1');
     const q1Ans = state.sessionData.flow_responses?.relationships_q1 || [];
-    const hasRomantic = q1Ans.includes("With my Girlfriend") || q1Ans.includes("With my Boyfriend") || q1Ans.includes("With my Partner");
-    const hasSocialCircle = q1Ans.includes("With Family") || q1Ans.includes("With Friends / Peers");
     
-    if (hasRomantic) {
+    // Task 1: Step 1 Checkbox State Evaluation Array
+    const hasAlone = q1Ans.includes("Mostly Alone");
+    const hasFamily = q1Ans.includes("With Family");
+    const hasFriends = q1Ans.includes("With Friends / Peers");
+    const hasPartner = q1Ans.includes("With my Girlfriend") || q1Ans.includes("With my Boyfriend") || q1Ans.includes("With my Partner");
+
+    // Task 2: Perfect Permutation Routing Logic
+    if (hasPartner === true) {
       dynamicNodes.push('relationships_q2_active');
-    } else if (hasSocialCircle) {
+    } else if (hasPartner === false && (hasFamily === true || hasFriends === true)) {
       dynamicNodes.push('relationships_q2_social_circle');
+    } else if (hasPartner === false && hasFamily === false && hasFriends === false && hasAlone === true) {
+      dynamicNodes.push('relationships_q2_history');
+    } else {
+      // Zero edge-case fallback: if no checkboxes are selected
+      dynamicNodes.push('relationships_q2_history');
     }
     
     dynamicNodes.push('relationships_q3', 'relationships_q4');
@@ -2541,7 +2578,7 @@ function renderWhatsHoldingYouBack(viewWrap) {
     </div>
 
     <!-- 2-Column Responsive Layout Container Grid -->
-    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-4 md:px-8 items-start mt-8">
+    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-4 md:px-8 mt-8">
       
       <!-- COLUMN 1: Why Most People Stay Stuck (The Reality Loop) -->
       <div class="w-full">
@@ -2639,7 +2676,7 @@ function renderWhatsHoldingYouBack(viewWrap) {
     </div>
 
     <!-- 3-Column Metrics Panel Row: How Kairos Will Help -->
-    <div class="w-full max-w-6xl mx-auto px-4 md:px-8 mt-12">
+    <div class="w-full max-w-6xl mx-auto px-4 md:px-8 mt-6">
       <div class="p-6 md:p-8 border border-neutral-800 bg-zinc-950/40 rounded-xl">
         <h3 style="margin: 0 0 24px 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; text-align: center;">How Kairos Will Help</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
