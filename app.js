@@ -629,56 +629,153 @@ const ALL_FLOW_NODES = {
   },
 
   relationships_q3: {
-    type: 'single',
-    title: "Which social challenge affects you the most right now?",
-    subtitle: "Select the primary friction point.",
-    get options() {
+    type: 'custom',
+    render: (viewWrap) => {
+      // get options dynamically based on Q1
       const q1Ans = state.sessionData.flow_responses?.relationships_q1 || [];
-      const opts = [];
-
+      const envOptions = [];
       if (q1Ans.includes("Mostly Alone")) {
-        opts.push({ id: 'rel_q3_isolation', text: "I feel isolated from people", desc: "Lacking high-vibe social outlets and feeling cut off.", icon: 'user-x' });
+        envOptions.push({ id: 'rel_q3_isolation', text: "I feel isolated from people", desc: "Lacking high-vibe social outlets and feeling cut off.", icon: 'user-x' });
       }
       if (q1Ans.includes("With Family")) {
-        opts.push({ id: 'rel_q3_family', text: "Family stress affects my focus", desc: "Domestic drama or high family expectations breaking focus.", icon: 'home' });
+        envOptions.push({ id: 'rel_q3_family', text: "Family stress affects my focus", desc: "Domestic drama or high family expectations breaking focus.", icon: 'home' });
       }
       if (q1Ans.includes("With Friends / Peers")) {
-        opts.push({ id: 'rel_q3_peers', text: "My circle lacks ambition or direction", desc: "Complacent friends who just want to kill time.", icon: 'users' });
+        envOptions.push({ id: 'rel_q3_peers', text: "My circle lacks ambition or direction", desc: "Complacent friends who just want to kill time.", icon: 'users' });
       }
       
-      // Always show
-      opts.push({ id: 'rel_q3_none', text: "My social environment is mostly stable", desc: "Stable social connections; focus remains on execution.", icon: 'shield-check' });
+      // Always show stable fallback
+      envOptions.push({ id: 'rel_q3_none', text: "My social environment is mostly stable", desc: "Stable social connections; focus remains on execution.", icon: 'shield-check' });
 
-      return opts;
-    },
-    save: (val) => {
-      state.sessionData.flow_responses.relationships_q3 = val;
-      state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
-      if (val === "I feel isolated from people") {
-        state.sessionData.dashboard_offers.social = 'Social Connection & Vibe Alignment Protocol';
-      } else if (val === "Family stress affects my focus") {
-        state.sessionData.dashboard_offers.social = 'Stoic Boundaries & Compassion Rings Map';
-      } else if (val === "My circle lacks ambition or direction") {
-        state.sessionData.dashboard_offers.social = 'Attention Insulation & Peer Upgrades Vault';
-      } else {
-        state.sessionData.dashboard_offers.social = 'Inner Circle Automation Reminders';
-      }
-    }
-  },
+      // Psychological choices
+      const psychOptions = [
+        { id: 'rel_q4_anxiety', text: "Overthinking & Social Anxiety", desc: "Fear of judgment or over-analyzing social interactions.", icon: 'alert-circle' },
+        { id: 'rel_q4_pleasing', text: "Weak Boundaries / People Pleasing", desc: "Sacrificing personal priorities to appease others.", icon: 'shield-alert' },
+        { id: 'rel_q4_validation', text: "Validation Seeking", desc: "Chasing external approval or status comparison loops.", icon: 'award' },
+        { id: 'rel_q4_isolation', text: "Emotional Isolation", desc: "Struggling to let people in or build deep emotional bridges.", icon: 'lock' },
+        { id: 'rel_q4_confident', text: "I communicate confidently", desc: "Confident, stable, and highly functional interpersonal states.", icon: 'shield-check' }
+      ];
 
-  relationships_q4: {
-    type: 'single',
-    title: "What is your biggest internal struggle when dealing with people?",
-    subtitle: "Select the closest bottleneck.",
-    options: [
-      { id: 'rel_q4_anxiety', text: "Overthinking & Social Anxiety", desc: "Fear of judgment or over-analyzing social interactions.", icon: 'alert-circle' },
-      { id: 'rel_q4_pleasing', text: "Weak Boundaries / People Pleasing", desc: "Sacrificing personal priorities to appease others.", icon: 'shield-alert' },
-      { id: 'rel_q4_validation', text: "Validation Seeking", desc: "Chasing external approval or status comparison loops.", icon: 'award' },
-      { id: 'rel_q4_isolation', text: "Emotional Isolation", desc: "Struggling to let people in or build deep emotional bridges.", icon: 'lock' },
-      { id: 'rel_q4_confident', text: "I communicate confidently", desc: "Confident, stable, and highly functional interpersonal states.", icon: 'shield-check' }
-    ],
-    save: (val) => {
-      state.sessionData.flow_responses.relationships_q4 = val;
+      // Retrieve previous values if back-navigating
+      let selectedEnv = state.sessionData.flow_responses?.relationships_q3 || '';
+      let selectedPsych = state.sessionData.flow_responses?.relationships_q4 || '';
+
+      viewWrap.innerHTML = `
+        <div class="question-header" style="margin-bottom: 24px;">
+          <span class="question-pre">Social Friction Audit</span>
+          <h2 class="question-title">What is your primary social bottleneck?</h2>
+          <p class="question-desc">We need to map both your external social environment and your internal psychological patterns.</p>
+        </div>
+        
+        <div class="merged-friction-form" style="display: flex; flex-direction: column; gap: 32px; width: 100%;">
+          
+          <!-- PART 1: Environmental check -->
+          <div class="env-friction-section" style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-indigo); font-family: 'Outfit', sans-serif;">1. External Social Environment</h3>
+            <p style="margin: 0; font-size: 13px; color: var(--text-secondary); font-family: 'Plus Jakarta Sans', sans-serif;">Select the primary external friction point you experience daily:</p>
+            <div class="cards-layout" style="margin-top: 8px;">
+              ${envOptions.map(opt => {
+                const isSel = selectedEnv === opt.text;
+                return `
+                  <div class="glow-card env-card ${isSel ? 'selected' : ''}" data-value="${opt.text}" style="padding: 16px 20px;">
+                    <div class="card-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.15); color: var(--accent-indigo); margin-right: 16px; flex-shrink: 0;">
+                      <i data-lucide="${opt.icon}" style="width: 16px; height: 16px;"></i>
+                    </div>
+                    <div class="card-content" style="text-align: left; flex-grow: 1;">
+                      <span class="card-title" style="font-size: 14px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">${opt.text}</span>
+                      <p class="card-desc" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.45;">${opt.desc}</p>
+                    </div>
+                    <div class="card-indicator">
+                      <i data-lucide="check"></i>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- PART 2: Internal Psychological Struggle -->
+          <div class="psych-friction-section" style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-indigo); font-family: 'Outfit', sans-serif;">2. Internal Psychological Struggle</h3>
+            <p style="margin: 0; font-size: 13px; color: var(--text-secondary); font-family: 'Plus Jakarta Sans', sans-serif;">Select your primary internal friction point when interacting with others:</p>
+            <div class="cards-layout" style="margin-top: 8px;">
+              ${psychOptions.map(opt => {
+                const isSel = selectedPsych === opt.text;
+                return `
+                  <div class="glow-card psych-card ${isSel ? 'selected' : ''}" data-value="${opt.text}" style="padding: 16px 20px;">
+                    <div class="card-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); color: #ef4444; margin-right: 16px; flex-shrink: 0;">
+                      <i data-lucide="${opt.icon}" style="width: 16px; height: 16px;"></i>
+                    </div>
+                    <div class="card-content" style="text-align: left; flex-grow: 1;">
+                      <span class="card-title" style="font-size: 14px; font-weight: 600; color: #fff; font-family: 'Outfit', sans-serif;">${opt.text}</span>
+                      <p class="card-desc" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.45;">${opt.desc}</p>
+                    </div>
+                    <div class="card-indicator">
+                      <i data-lucide="check"></i>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Action button -->
+          <div class="action-bar" style="margin-top: 16px; display: flex; justify-content: center; width: 100%;">
+            <button id="btn-submit-friction-audit" class="btn-premium primary" style="min-width: 280px;" ${selectedEnv && selectedPsych ? '' : 'disabled'}>
+              <span>Continue</span>
+              <i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+
+        </div>
+      `;
+
+      // Set up click handlers
+      const envCards = viewWrap.querySelectorAll('.env-card');
+      const psychCards = viewWrap.querySelectorAll('.psych-card');
+      const submitBtn = viewWrap.querySelector('#btn-submit-friction-audit');
+
+      envCards.forEach(card => {
+        card.addEventListener('click', () => {
+          envCards.forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedEnv = card.getAttribute('data-value');
+          if (selectedEnv && selectedPsych) {
+            submitBtn.removeAttribute('disabled');
+          }
+        });
+      });
+
+      psychCards.forEach(card => {
+        card.addEventListener('click', () => {
+          psychCards.forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedPsych = card.getAttribute('data-value');
+          if (selectedEnv && selectedPsych) {
+            submitBtn.removeAttribute('disabled');
+          }
+        });
+      });
+
+      submitBtn.addEventListener('click', () => {
+        // Save both values
+        state.sessionData.flow_responses.relationships_q3 = selectedEnv;
+        state.sessionData.flow_responses.relationships_q4 = selectedPsych;
+
+        // Custom dashboard offer logic based on env challenge
+        state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
+        if (selectedEnv === "I feel isolated from people") {
+          state.sessionData.dashboard_offers.social = 'Social Connection & Vibe Alignment Protocol';
+        } else if (selectedEnv === "Family stress affects my focus") {
+          state.sessionData.dashboard_offers.social = 'Stoic Boundaries & Compassion Rings Map';
+        } else if (selectedEnv === "My circle lacks ambition or direction") {
+          state.sessionData.dashboard_offers.social = 'Attention Insulation & Peer Upgrades Vault';
+        } else {
+          state.sessionData.dashboard_offers.social = 'Inner Circle Automation Reminders';
+        }
+
+        advanceStep();
+      });
     }
   },
 
@@ -1048,7 +1145,7 @@ function buildDynamicQueue() {
     } else {
       dynamicNodes.push('relationships_q2_history');
     }
-    dynamicNodes.push('relationships_q3', 'relationships_q4');
+    dynamicNodes.push('relationships_q3');
   }
 
   const universalEndNodes = [
@@ -1895,6 +1992,7 @@ function renderAiAnalysisLoading(viewWrap) {
 
 // SCREEN: "How We See You" Analysis Screen
 function renderHowWeSeeYou(viewWrap) {
+  viewWrap.className = 'page-view page-view-wide';
   const analysis = generateAIPersonalityAnalysis();
   const info = state.sessionData.basic_info;
 
@@ -1906,7 +2004,7 @@ function renderHowWeSeeYou(viewWrap) {
     </div>
 
     <p class="analysis-intro-text">
-      Alexander, your responses paint a clear picture of a highly self-aware individual. You have recognized where your daily routines break down, and you have taken the first step by deconstructing the habits holding you back. Here is your baseline profile:
+      ${info?.first_name || 'Alexander'}, your responses paint a clear picture of a highly self-aware individual. You have recognized where your daily routines break down, and you have taken the first step by deconstructing the habits holding you back. Here is your baseline profile:
     </p>
 
     <div class="analysis-grid">
@@ -1931,6 +2029,32 @@ function renderHowWeSeeYou(viewWrap) {
         <p class="analysis-card-text">${analysis.patterns.text}</p>
         <div class="analysis-tags">
           ${analysis.patterns.tags.map(t => `<span class="analysis-tag">${t}</span>`).join('')}
+        </div>
+      </div>
+
+      <!-- Card 3: Identified Friction Points -->
+      <div class="analysis-card struggles-card glow-card">
+        <div class="analysis-card-title">
+          <i data-lucide="alert-triangle" style="color: var(--accent-indigo);"></i>
+          <span>Identified Friction Points</span>
+        </div>
+        <div class="analysis-card-text" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+          <p style="margin: 0; font-size: 13.5px; color: var(--text-secondary); font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.55; text-align: left;">
+            We have parsed your specific habit bottlenecks and focus leaks to isolate the friction points slowing your daily momentum:
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            ${analysis.struggles.map(s => `
+              <div style="display: flex; gap: 12px; align-items: start; text-align: left;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ff453a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                  <i data-lucide="${s.icon}" style="width: 12px; height: 12px;"></i>
+                </div>
+                <div>
+                  <span style="font-size: 13px; font-weight: 700; color: #fff; display: block; font-family: 'Outfit', sans-serif;">${s.title}</span>
+                  <p style="font-size: 11.5px; color: var(--text-secondary); margin: 2px 0 0 0; line-height: 1.4; font-family: 'Plus Jakarta Sans', sans-serif;">${s.desc}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       </div>
     </div>
@@ -2551,83 +2675,45 @@ function renderWhatsHoldingYouBack(viewWrap) {
         </div>
       </div>
 
-      <!-- COLUMN 2: Friction Points & Strategies -->
-      <div class="w-full flex flex-col gap-8">
+      <!-- COLUMN 2: Breaking the Loop -->
+      <div class="w-full flex flex-col gap-6">
+        <h3 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif;">Breaking the Loop</h3>
+        <p style="margin: 0 0 12px 0; font-size: 13.5px; color: var(--text-secondary); font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.55;">To build bulletproof consistency, Kairos deploys a suite of behavioral counter-strategies designed to neutralize execution drag:</p>
         
-        <!-- Top Section: Your Current Friction Points -->
         <div class="flex flex-col gap-4">
-          <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif;">Your Current Friction Points</h3>
-          
-          <div class="flex flex-col gap-4">
-            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
-              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ff453a; flex-shrink: 0; margin: 0;">
-                <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
-              </div>
-              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Motivation Dependency</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Relying purely on emotional inspiration rather than built-in habit structures.</p>
-              </div>
+          <!-- Strategy 1 -->
+          <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
+            <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
+              <i data-lucide="anchor" style="width: 16px; height: 16px;"></i>
             </div>
-
-            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
-              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ff453a; flex-shrink: 0; margin: 0;">
-                <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
-              </div>
-              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Focus Fragmentation</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Dividing daily attention across notifications, tasks, and digital loops.</p>
-              </div>
+            <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+              <span class="struggle-title" style="font-size: 15px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Habit Anchoring</span>
+              <p class="struggle-desc" style="font-size: 13px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.45;">Deploying frictionless 5-minute micro-habits to instantly bypass brain friction and mental resistance.</p>
             </div>
+          </div>
 
-            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
-              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ff453a; flex-shrink: 0; margin: 0;">
-                <i data-lucide="navigation" style="width: 16px; height: 16px;"></i>
-              </div>
-              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Inconsistent Direction</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Attempting to progress without a highly structured daily program path.</p>
-              </div>
+          <!-- Strategy 2 -->
+          <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
+            <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
+              <i data-lucide="shield" style="width: 16px; height: 16px;"></i>
+            </div>
+            <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+              <span class="struggle-title" style="font-size: 15px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Distraction Protection</span>
+              <p class="struggle-desc" style="font-size: 13px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.45;">Building non-negotiable digital environmental blockades to aggressively insulate your high-focus windows.</p>
+            </div>
+          </div>
+
+          <!-- Strategy 3 -->
+          <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
+            <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
+              <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i>
+            </div>
+            <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
+              <span class="struggle-title" style="font-size: 15px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Consistency Scaling</span>
+              <p class="struggle-desc" style="font-size: 13px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.45;">Systematically scaling baseline routine targets only after your core daily daily execution velocity stabilizes.</p>
             </div>
           </div>
         </div>
-
-        <!-- Bottom Section: How Kairos Will Help -->
-        <div class="flex flex-col gap-4">
-          <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif;">How Kairos Will Help</h3>
-          
-          <div class="flex flex-col gap-4">
-            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
-              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
-                <i data-lucide="anchor" style="width: 16px; height: 16px;"></i>
-              </div>
-              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Habit Anchoring</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Frictionless 5-minute micro-habits that completely bypass brain resistance.</p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
-              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
-                <i data-lucide="shield" style="width: 16px; height: 16px;"></i>
-              </div>
-              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Distraction Protection</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Attention barriers that insulate your high-performance focus blocks.</p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-4 p-5 border border-neutral-900 bg-zinc-950 rounded-lg glow-card">
-              <div class="struggle-icon-box" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--accent-indigo); flex-shrink: 0; margin: 0;">
-                <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i>
-              </div>
-              <div class="struggle-details" style="display: flex; flex-direction: column; gap: 4px;">
-                <span class="struggle-title" style="font-size: 14px; font-weight: 700; color: #fff; display: block; text-align: left; font-family: 'Outfit', sans-serif;">Consistency Scaling</span>
-                <p class="struggle-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0; text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4;">Calibrated baseline progression targets that grow only as self-trust scales.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
     </div>

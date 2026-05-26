@@ -3566,6 +3566,21 @@ html, body {
   }
 }
 
+/* --- How We See You 3-Column Grid Upgrade --- */
+@media (min-width: 900px) {
+  .page-view-wide .analysis-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+@media (max-width: 899px) {
+  .page-view-wide .analysis-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+.analysis-card.struggles-card {
+  border-left: 4px solid var(--accent-indigo) !important;
+}
+
 
 
 
