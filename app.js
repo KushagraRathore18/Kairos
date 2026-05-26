@@ -648,37 +648,21 @@ const ALL_FLOW_NODES = {
     type: 'single',
     title: "What is your primary external bottleneck when dealing with people?",
     subtitle: "Select the primary external friction point.",
-    get options() {
-      const q1Ans = state.sessionData.flow_responses?.relationships_q1 || [];
-      const hasAlone = q1Ans.includes("Mostly Alone");
-      const hasFamily = q1Ans.includes("With Family");
-      const hasFriends = q1Ans.includes("With Friends / Peers");
-
-      const opts = [];
-
-      if (hasAlone) {
-        opts.push({ id: 'rel_q3_isolation', text: "Isolation Sink", desc: "I have zero active social outlets and feel completely cut off.", icon: 'user-x' });
-      }
-      if (hasFamily) {
-        opts.push({ id: 'rel_q3_family', text: "Family Friction", desc: "High domestic expectations or family drama are breaking my focus.", icon: 'home' });
-      }
-      if (hasFriends) {
-        opts.push({ id: 'rel_q3_peers', text: "Low-Vibe Circle", desc: "My current friends are complacent and just want to kill time.", icon: 'users' });
-      }
-      
-      // ALWAYS Push Baseline Option: "Stable Environment"
-      opts.push({ id: 'rel_q3_stable', text: "Stable Environment", desc: "My social connections are stable; focus remains on execution.", icon: 'shield-check' });
-
-      return opts;
-    },
+    options: [
+      { id: 'rel_q3_isolation', text: "Isolation Sink", desc: "I have zero active social outlets and feel completely cut off from the world.", icon: 'user-x' },
+      { id: 'rel_q3_peers', text: "Low-Vibe / Complacent Circle", desc: "My current friends lack ambition, waste time, and hold me back from growing.", icon: 'users' },
+      { id: 'rel_q3_family', text: "Family Friction / Drama", desc: "High domestic expectations, constant arguments, or family chaos are breaking my focus.", icon: 'home' },
+      { id: 'rel_q3_romantic', text: "Romantic Drain / Volatility", desc: "Relationship arguments, needy partners, or post-breakup fallout are consuming my energy.", icon: 'heart' },
+      { id: 'rel_q3_stable', text: "Stable Environment", desc: "My social circles and environment are completely supportive; zero friction.", icon: 'shield-check' }
+    ],
     save: (val) => {
       // Map to backward compatible strings for scoring engine
       let mapped = "My social environment is mostly stable";
       if (val === "Isolation Sink") {
         mapped = "I feel isolated from people";
-      } else if (val === "Family Friction") {
+      } else if (val === "Family Friction / Drama") {
         mapped = "Family stress affects my focus";
-      } else if (val === "Low-Vibe Circle") {
+      } else if (val === "Low-Vibe / Complacent Circle") {
         mapped = "My circle lacks ambition or direction";
       }
       state.sessionData.flow_responses.relationships_q3 = mapped;
@@ -687,10 +671,12 @@ const ALL_FLOW_NODES = {
       state.sessionData.dashboard_offers = state.sessionData.dashboard_offers || {};
       if (val === "Isolation Sink") {
         state.sessionData.dashboard_offers.social = 'Social Connection & Vibe Alignment Protocol';
-      } else if (val === "Family Friction") {
+      } else if (val === "Family Friction / Drama") {
         state.sessionData.dashboard_offers.social = 'Stoic Boundaries & Compassion Rings Map';
-      } else if (val === "Low-Vibe Circle") {
+      } else if (val === "Low-Vibe / Complacent Circle") {
         state.sessionData.dashboard_offers.social = 'Attention Insulation & Peer Upgrades Vault';
+      } else if (val === "Romantic Drain / Volatility") {
+        state.sessionData.dashboard_offers.social = 'Relationship Stability & Boundary Upgrades';
       } else {
         state.sessionData.dashboard_offers.social = 'Inner Circle Automation Reminders';
       }
@@ -2676,7 +2662,7 @@ function renderWhatsHoldingYouBack(viewWrap) {
     </div>
 
     <!-- 3-Column Metrics Panel Row: How Kairos Will Help -->
-    <div class="w-full max-w-6xl mx-auto px-4 md:px-8 mt-6">
+    <div class="w-full mt-6 clear-both block max-w-6xl mx-auto px-4 md:px-8">
       <div class="p-6 md:p-8 border border-neutral-800 bg-zinc-950/40 rounded-xl">
         <h3 style="margin: 0 0 24px 0; font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Outfit', sans-serif; text-align: center;">How Kairos Will Help</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

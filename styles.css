@@ -3552,6 +3552,12 @@ html, body {
 .mt-6 {
   margin-top: 24px !important;
 }
+.clear-both {
+  clear: both !important;
+}
+.block {
+  display: block !important;
+}
 .mt-12 {
   margin-top: 48px !important;
 }
